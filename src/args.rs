@@ -1,16 +1,18 @@
+use std::path::PathBuf;
+
 /// Program lab 1
 #[derive(clap::Parser, Debug)]
 #[command(version, about, long_about = None)]
 pub struct Args {
     /// Path to input file.
-    #[arg(short, long)]
-    pub input: String,
+    #[arg(short, long, value_name="FILE")]
+    pub input: PathBuf,
     /// Path to output file.
-    #[arg(short, long)]
-    pub output: String,
+    #[arg(short, long, value_name="FILE")]
+    pub output: PathBuf,
     /// Path to key file.
-    #[arg(short, long)]
-    pub key: String,
+    #[arg(short, long, value_name="FILE")]
+    pub key: PathBuf,
     /// Program operation mode.
     #[clap(flatten)]
     pub mode_group: ModeGroup,
