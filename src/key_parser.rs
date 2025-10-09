@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 
-pub fn key_parser(key: File, mode: OperatingMode) -> HashMap<char, char> {
+pub fn key_parser(key: File, mode: &OperatingMode) -> HashMap<char, char> {
     let mut map: HashMap<char, char> = HashMap::new();
     let reader = BufReader::new(key);
 
@@ -24,6 +24,7 @@ pub fn key_parser(key: File, mode: OperatingMode) -> HashMap<char, char> {
                     let value = parts[0].chars().next().unwrap();
                     map.insert(key, value);
                 }
+                OperatingMode::NGRAM => {}
             }
         }
     }

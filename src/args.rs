@@ -1,3 +1,4 @@
+use std::os::raw::c_long;
 use std::path::PathBuf;
 
 /// Program lab 1
@@ -27,4 +28,7 @@ pub struct ModeGroup {
     /// Decryption mode.
     #[arg(short, long)]
     pub decrypt: bool,
+    /// Monogram generation mode.
+    #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4))]
+    pub gram: Option<u8>,
 }

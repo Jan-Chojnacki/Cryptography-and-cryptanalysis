@@ -2,6 +2,7 @@ mod args;
 mod key_parser;
 mod operating_mode;
 mod input_parser;
+mod ngram_generator;
 
 use crate::args::Args;
 use clap::Parser;
@@ -10,6 +11,7 @@ use std::io::Write;
 use std::path::Path;
 use crate::input_parser::input_parser;
 use crate::key_parser::key_parser;
+use crate::ngram_generator::ngram_generator;
 use crate::operating_mode::OperatingMode;
 
 fn main() {
@@ -30,10 +32,10 @@ fn main() {
         panic!("Only files with .txt extension are supported.");
     }
 
-    let operating_mode = match (args.mode_group.decrypt, args.mode_group.encrypt) {
-        (true, false) => OperatingMode::DECRYPTION,
-        (false, true) => OperatingMode::ENCRYPTION,
-        (_, _) => panic!("Only one operating mode can be selected at a time.")
+    let operating_mode = match (args.mode_group.decrypt, args.mode_group.encrypt, args.mode_group.gram) {
+        (true, _, _) => OperatingMode::DECRYPTION,
+        (_, true, _) => OperatingMode::ENCRYPTION,
+        (_, _, n) => OperatingMode::NGRAM,
     };
 
     let input = OpenOptions::new()
@@ -54,9 +56,23 @@ fn main() {
         .expect("Failed to open key file");
 
     let input = input_parser(input);
-    let key = key_parser(key, operating_mode);
+    let key = key_parser(key, &operating_mode);
+
+    let mut buf = String::new();
+
+    match operating_mode {
+        OperatingMode::ENCRYPTION => {
+            buf = input;
+        }
+        OperatingMode::DECRYPTION => {
+            buf = input;
+        }
+        OperatingMode::NGRAM => {
+            buf = ngram_generator(&input, args.mode_group.gram.unwrap()).join("\n");
+        }
+    }
 
     output
-        .write_all(input.as_bytes())
+        .write_all(buf.as_bytes())
         .expect(format!("Could not write to output file at: {:?}.", output).as_str());
 }
