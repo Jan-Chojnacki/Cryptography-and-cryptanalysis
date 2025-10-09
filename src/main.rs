@@ -19,26 +19,15 @@ fn main() {
     if input.extension().and_then(|ext| ext.to_str()) != Some("txt") {
         panic!("Only files with .txt extension are supported.");
     }
-    if !input.exists() {
-        panic!("Input path does not exist: {:?}", input);
-    }
 
     let output = Path::new(&args.output);
     if output.extension().and_then(|ext| ext.to_str()) != Some("txt") {
         panic!("Only files with .txt extension are supported.");
     }
-    if !output.exists() {
-        println!("Output path does not exist: {:?}", output);
-        OpenOptions::new().write(true).create_new(true).open(output).expect(&format!("Could not create file at: {:?}", output));
-        println!("Creating output file at: {:?}", output);
-    }
 
     let key = Path::new(&args.key);
     if key.extension().and_then(|ext| ext.to_str()) != Some("txt") {
         panic!("Only files with .txt extension are supported.");
-    }
-    if !key.exists() {
-        panic!("Key path does not exist: {:?}", key);
     }
 
     let operating_mode = match (args.mode_group.decrypt, args.mode_group.encrypt) {
@@ -47,15 +36,22 @@ fn main() {
         (_, _) => panic!("Only one operating mode can be selected at a time.")
     };
 
-    let input = File::open(input).expect("Failed to open input file");
+    let input = OpenOptions::new()
+        .read(true)
+        .open(input)
+        .expect("Failed to open input file");
 
     let mut output = OpenOptions::new()
         .write(true)
+        .create(true)
         .truncate(true)
         .open(output)
         .expect("Failed to open output file");
 
-    let key = File::open(key).expect("Failed to open key file");
+    let key = OpenOptions::new()
+        .read(true)
+        .open(key)
+        .expect("Failed to open key file");
 
     let input = input_parser(input);
     let key = key_parser(key, operating_mode);
