@@ -4,6 +4,7 @@ mod operating_mode;
 mod input_parser;
 mod ngram_generator;
 
+use std::collections::HashMap;
 use crate::args::Args;
 use clap::Parser;
 use std::fs::{File, OpenOptions};
@@ -58,7 +59,7 @@ fn main() {
     let input = input_parser(input);
     let key = key_parser(key, &operating_mode);
 
-    let mut buf = String::new();
+    let buf;
 
     match operating_mode {
         OperatingMode::ENCRYPTION => {
@@ -68,7 +69,16 @@ fn main() {
             buf = input;
         }
         OperatingMode::NGRAM => {
-            buf = ngram_generator(&input, args.mode_group.gram.unwrap()).join("\n");
+            buf = ngram_generator(&input, args.mode_group.gram.unwrap())
+                .iter()
+                .fold(HashMap::new(), |mut acc, gram| {
+                    *acc.entry(gram).or_insert(0) += 1;
+                    acc
+                })
+                .iter()
+                .map(|(gram, count)| format!("{} {}", gram, count))
+                .collect::<Vec<_>>()
+                .join("\n");
         }
     }
 
