@@ -1,11 +1,13 @@
 mod args;
 mod key_parser;
 mod operating_mode;
+mod input_parser;
 
 use crate::args::Args;
 use clap::Parser;
 use std::fs::{File, OpenOptions};
 use std::path::Path;
+use crate::input_parser::input_parser;
 use crate::key_parser::key_parser;
 use crate::operating_mode::OperatingMode;
 
@@ -48,6 +50,7 @@ fn main() {
     let output = File::open(output).unwrap();
     let key = File::open(key).unwrap();
 
+    let input = input_parser(input);
     let key = key_parser(key, operating_mode);
 
     println!("{:?}", args);
