@@ -8,7 +8,6 @@ pub fn input_parser(input: File) -> String {
     for line in reader.lines() {
         if let Ok(line) = line {
             let filtered_string: String = line.chars().filter(|c| c.is_alphabetic()).collect();
-            dbg!(&filtered_string);
             buf.push(filtered_string.to_uppercase())
         }
     }

@@ -6,6 +6,7 @@ mod input_parser;
 use crate::args::Args;
 use clap::Parser;
 use std::fs::{File, OpenOptions};
+use std::io::Write;
 use std::path::Path;
 use crate::input_parser::input_parser;
 use crate::key_parser::key_parser;
@@ -46,15 +47,20 @@ fn main() {
         (_, _) => panic!("Only one operating mode can be selected at a time.")
     };
 
-    let input = File::open(input).unwrap();
-    let output = File::open(output).unwrap();
-    let key = File::open(key).unwrap();
+    let input = File::open(input).expect("Failed to open input file");
+
+    let mut output = OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .open(output)
+        .expect("Failed to open output file");
+
+    let key = File::open(key).expect("Failed to open key file");
 
     let input = input_parser(input);
     let key = key_parser(key, operating_mode);
 
-    println!("{:?}", args);
-    println!("{:?}", input);
-    println!("{:?}", output);
-    println!("{:?}", key);
+    output
+        .write_all(input.as_bytes())
+        .expect(format!("Could not write to output file at: {:?}.", output).as_str());
 }
