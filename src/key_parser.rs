@@ -24,7 +24,7 @@ pub fn key_parser(key: File, mode: &OperatingMode) -> HashMap<char, char> {
                     let value = parts[0].chars().next().unwrap();
                     map.insert(key, value);
                 }
-                OperatingMode::NGRAM => {}
+                _ => {}
             }
         }
     }

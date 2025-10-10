@@ -1,5 +1,6 @@
 pub enum OperatingMode {
     ENCRYPTION,
     DECRYPTION,
-    NGRAM,
+    NgramGenerator,
+    NgramReader,
 }
