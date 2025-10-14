@@ -31,7 +31,7 @@ fn main() {
             let input = input_parser(input);
             let key = key_parser(key, &operating_mode);
 
-            let buf = input;
+            let buf:String = input.chars().map(|x| key.get(&x).unwrap()).collect();
 
             output
                 .write_all(buf.as_bytes())
@@ -45,7 +45,7 @@ fn main() {
             let input = input_parser(input);
             let key = key_parser(key, &operating_mode);
 
-            let buf = input;
+            let buf:String = input.chars().map(|x| key.get(&x).unwrap()).collect();
 
             output
                 .write_all(buf.as_bytes())
@@ -73,7 +73,6 @@ fn main() {
             let ngram = ngram_parser(ngram, args.mode_group.read_ngram.unwrap());
 
             println!("{}", ngram_to_string(ngram));
-
         },
         OperatingMode::X2TEST => {
             let input = open_input(args.input.unwrap()).expect("Failed to open input file");
