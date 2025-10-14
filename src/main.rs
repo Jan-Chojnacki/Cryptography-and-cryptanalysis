@@ -1,20 +1,17 @@
 mod args;
+mod converters;
 mod file_handling;
-mod histogram_generator;
-mod input_parser;
-mod key_parser;
-mod ngram_generator;
-mod ngram_parser;
+mod file_parsers;
+mod generators;
 mod operating_mode;
 mod validate_paths;
 
 use crate::args::Args;
+use crate::converters::ngram_to_string;
 use crate::file_handling::{open_input, open_key, open_output};
-use crate::histogram_generator::histogram_generator;
-use crate::input_parser::input_parser;
-use crate::key_parser::key_parser;
-use crate::ngram_generator::ngram_generator;
-use crate::ngram_parser::ngram_parser;
+use crate::file_parsers::input_parser;
+use crate::file_parsers::key_parser;
+use crate::generators::{histogram_generator, ngram_generator};
 use crate::operating_mode::OperatingMode;
 use clap::Parser;
 use std::fs::OpenOptions;
@@ -85,7 +82,7 @@ fn main() {
 
             let ngram = ngram_generator(&input, args.mode_group.gram.unwrap());
             let histogram = histogram_generator(ngram);
-            let buf = ngram_parser(histogram);
+            let buf = ngram_to_string(histogram);
 
             println!("{buf}");
 
