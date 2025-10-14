@@ -23,3 +23,10 @@ pub fn open_key(path: PathBuf) -> Result<File, String> {
         .open(path)
         .map_err(|e| format!("{:?}", e))
 }
+
+pub fn open_ngram(path: PathBuf) -> Result<File, String> {
+    OpenOptions::new()
+        .read(true)
+        .open(path)
+        .map_err(|e| format!("{:?}", e))
+}

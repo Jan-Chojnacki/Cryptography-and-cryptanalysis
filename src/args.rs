@@ -17,6 +17,12 @@ pub struct Args {
     /// Program operation mode.
     #[clap(flatten)]
     pub mode_group: ModeGroup,
+    /// Path to ngram file.
+    #[arg(value_name = "FILE", requires = "read_ngram")]
+    pub read_ngram_file: Option<PathBuf>,
+    /// Generating x^2 test.
+    #[arg(short)]
+    pub s: bool,
 }
 
 #[derive(clap::Args, Debug)]
@@ -28,9 +34,12 @@ pub struct ModeGroup {
     /// Decryption mode.
     #[arg(short, long)]
     pub decrypt: bool,
-    /// Monogram generation mode.
+    /// Ngram generation mode.
     #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4))]
     pub gram: Option<u8>,
+    /// Ngram reading mode.
+    #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4))]
+    pub read_ngram: Option<u8>,
 }
 
 impl Args {
@@ -45,11 +54,16 @@ impl Args {
         match (
             self.mode_group.decrypt,
             self.mode_group.encrypt,
+            self.s,
             self.mode_group.gram,
+            self.mode_group.read_ngram,
         ) {
-            (true, _, _) => OperatingMode::DECRYPTION,
-            (_, true, _) => OperatingMode::ENCRYPTION,
-            (_, _, n) => OperatingMode::NgramGenerator,
+            (true, _, _, _, _) => OperatingMode::DECRYPTION,
+            (_, true, _, _, _) => OperatingMode::ENCRYPTION,
+            (_, _, true, _, _) => OperatingMode::X2TEST,
+            (_, _, _, Some(_), _) => OperatingMode::NgramGenerator,
+            (_, _, _, _, Some(_)) => OperatingMode::NgramReader,
+            _ => unreachable!("Exactly one mode must be set by clap ArgGroup"),
         }
     }
 

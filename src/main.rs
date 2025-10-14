@@ -8,13 +8,12 @@ mod validate_paths;
 
 use crate::args::Args;
 use crate::converters::ngram_to_string;
-use crate::file_handling::{open_input, open_key, open_output};
-use crate::file_parsers::input_parser;
+use crate::file_handling::{open_input, open_key, open_ngram, open_output};
+use crate::file_parsers::{input_parser, ngram_parser};
 use crate::file_parsers::key_parser;
 use crate::generators::{histogram_generator, ngram_generator};
 use crate::operating_mode::OperatingMode;
 use clap::Parser;
-use std::fs::OpenOptions;
 use std::io::Write;
 
 fn main() {
@@ -39,22 +38,9 @@ fn main() {
                 .expect(format!("Could not write to output file at: {:?}.", output).as_str());
         }
         OperatingMode::DECRYPTION => {
-            let input = OpenOptions::new()
-                .read(true)
-                .open(args.input.unwrap())
-                .expect("Failed to open input file");
-
-            let mut output = OpenOptions::new()
-                .write(true)
-                .create(true)
-                .truncate(true)
-                .open(args.output.unwrap())
-                .expect("Failed to open output file");
-
-            let key = OpenOptions::new()
-                .read(true)
-                .open(args.key.unwrap())
-                .expect("Failed to open key file");
+            let input = open_input(args.input.unwrap()).expect("Failed to open input file");
+            let mut output = open_output(args.output.unwrap()).expect("Failed to open output file");
+            let key = open_key(args.key.unwrap()).expect("Failed to open key file");
 
             let input = input_parser(input);
             let key = key_parser(key, &operating_mode);
@@ -66,17 +52,8 @@ fn main() {
                 .expect(format!("Could not write to output file at: {:?}.", output).as_str());
         }
         OperatingMode::NgramGenerator => {
-            let input = OpenOptions::new()
-                .read(true)
-                .open(args.input.unwrap())
-                .expect("Failed to open input file");
-
-            let mut output = OpenOptions::new()
-                .write(true)
-                .create(true)
-                .truncate(true)
-                .open(args.output.unwrap())
-                .expect("Failed to open output file");
+            let input = open_input(args.input.unwrap()).expect("Failed to open input file");
+            let mut output = open_output(args.output.unwrap()).expect("Failed to open output file");
 
             let input = input_parser(input);
 
@@ -90,6 +67,33 @@ fn main() {
                 .write_all(buf.as_bytes())
                 .expect(format!("Could not write to output file at: {:?}.", output).as_str());
         }
-        OperatingMode::NgramReader => {}
+        OperatingMode::NgramReader => {
+            let ngram = open_ngram(args.read_ngram_file.unwrap()).expect("Failed to open ngram file");
+
+            let ngram = ngram_parser(ngram, args.mode_group.read_ngram.unwrap());
+
+            println!("{}", ngram_to_string(ngram));
+
+        },
+        OperatingMode::X2TEST => {
+            let input = open_input(args.input.unwrap()).expect("Failed to open input file");
+
+            let input = input_parser(input);
+            let ngram = histogram_generator(ngram_generator(&input, args.mode_group.read_ngram.unwrap()));
+
+            let ngram_ref = open_ngram(args.read_ngram_file.unwrap()).expect("Failed to open ngram file");
+            let ngram_ref = ngram_parser(ngram_ref, args.mode_group.read_ngram.unwrap());
+
+            let mut sum: f64 = 0.0;
+
+            let n: u64 = ngram.iter().map(|(_, num)| num).sum();
+
+            for i in 0..ngram.len() {
+                let e = ngram_ref[i].1 * n as f64;
+                sum += (ngram[i].1 as f64 - e).powi(2) / e
+            }
+
+            println!("{sum:.20}")
+        }
     }
 }

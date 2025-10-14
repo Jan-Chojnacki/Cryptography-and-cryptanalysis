@@ -3,4 +3,5 @@ pub enum OperatingMode {
     DECRYPTION,
     NgramGenerator,
     NgramReader,
+    X2TEST,
 }
