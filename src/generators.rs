@@ -9,13 +9,17 @@ pub fn ngram_generator(input: &str, ngram_size: u8) -> Vec<String> {
 }
 
 pub fn histogram_generator(ngram: Vec<String>) -> Vec<(String, u64)> {
-    let mut res = ngram.iter().fold(HashMap::new(), |mut acc, gram| {
-        *acc.entry(gram.clone()).or_insert(0) += 1;
-        acc
-    }).iter().fold(Vec::new(), |mut acc, (k, v)| {
-        acc.push((k.clone(), *v));
-        acc
-    });
+    let mut res = ngram
+        .iter()
+        .fold(HashMap::new(), |mut acc, gram| {
+            *acc.entry(gram.clone()).or_insert(0) += 1;
+            acc
+        })
+        .iter()
+        .fold(Vec::new(), |mut acc, (k, v)| {
+            acc.push((k.clone(), *v));
+            acc
+        });
 
     res.sort_by_key(|&(_, v)| v);
     res.reverse();
