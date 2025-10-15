@@ -1,4 +1,5 @@
 use std::fs::{File, OpenOptions};
+use std::io::Write;
 use std::path::PathBuf;
 
 pub fn open_input(path: PathBuf) -> Result<File, String> {
@@ -29,4 +30,10 @@ pub fn open_ngram(path: PathBuf) -> Result<File, String> {
         .read(true)
         .open(path)
         .map_err(|e| format!("{:?}", e))
+}
+
+pub fn save_to_file(content: &str, mut output: File) {
+    output
+        .write_all(content.as_bytes())
+        .expect(format!("Could not write to output file at: {:?}.", output).as_str());
 }
