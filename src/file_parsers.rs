@@ -30,12 +30,12 @@ pub fn key_parser(key: File, mode: &OperatingMode) -> HashMap<char, char> {
                 panic!("Invalid key format.")
             }
             match mode {
-                OperatingMode::ENCRYPTION => {
+                OperatingMode::Encryption => {
                     let key = parts[0].chars().next().unwrap();
                     let value = parts[1].chars().next().unwrap();
                     map.insert(key, value);
                 }
-                OperatingMode::DECRYPTION => {
+                OperatingMode::Decryption => {
                     let key = parts[1].chars().next().unwrap();
                     let value = parts[0].chars().next().unwrap();
                     map.insert(key, value);

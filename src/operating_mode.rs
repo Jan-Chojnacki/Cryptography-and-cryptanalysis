@@ -1,7 +1,8 @@
+#[derive(Debug)]
 pub enum OperatingMode {
-    ENCRYPTION,
-    DECRYPTION,
+    Encryption,
+    Decryption,
     NgramGenerator,
     NgramReader,
-    X2TEST,
+    X2Test,
 }
