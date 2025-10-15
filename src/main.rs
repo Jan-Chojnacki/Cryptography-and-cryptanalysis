@@ -4,7 +4,6 @@ mod file_handling;
 mod file_parsers;
 mod generators;
 mod operating_mode;
-mod validate_paths;
 mod operations;
 
 use crate::args::Args;
