@@ -1,5 +1,5 @@
 use crate::operating_mode::OperatingMode;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::str::FromStr;
@@ -43,6 +43,13 @@ pub fn key_parser(key: File, mode: &OperatingMode) -> HashMap<char, char> {
                 _ => {}
             }
         }
+    }
+
+    let key_test: HashSet<char> = map.iter().map(|(&k, _)| k).collect();
+    let value_test: HashSet<char> = map.iter().map(|(_, &v)| v).collect();
+
+    if key_test.len() != 26 || value_test.len() != 26 {
+        panic!("Invalid key values.")
     }
 
     map
