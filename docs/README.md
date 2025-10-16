@@ -3,6 +3,53 @@
 ### Grupa 1ID24B
 ### Autorzy: Jakub Babiarski, Jan Chojnacki
 
+``` mermaid
+flowchart TD
+    A[Wejście]
+    B(Odczytywanie i walidacja poprawności kombinacji argumentów)
+    C(Walidacja ścieżek przekazanych w argumentach)
+    D{Określenie trybu pracy programu}
+    F(Koniec)
+
+    S1(Otwarcie plików przekazanych w argumentach)
+    S2(Przetworzenie zawartości wejścia i klucza)
+    S3(Zaszyfrowanie wejścia na podstawie klucza)
+    S4(Zapisanie zaszyfrowanego tekstu do pliku wyjścia)
+
+    D1(Otwarcie plików przekazanych w argumentach)
+    D2(Przetworzenie zawartości wejścia i klucza)
+    D3(Odszyfrowanie wejścia na podstawie klucza)
+    D4(Zapisanie odszyfrowanego tekstu do pliku wyjścia)
+
+    G1(Otwarcie plików przekazanych w argumentach)
+    G2(Przetworzenie zawartości wejścia)
+    G3(Wygenerowanie ngramu)
+    G4(Wypisanie ngramu na standardowe wyjście)
+    G5(Zapisanie ngramu do pliku wyjścia)
+
+    O1(Otwarcie plików przekazanych w argumentach)
+    O2(Przetworzenie zawartości wejścia)
+    O3(Obliczenie prawdopodobieństwa wystąpienia n-gramu)
+    O4(Wypisanie ngramu na standardowe wyjście)
+
+    T1(Otwarcie plików przekazanych w argumentach)
+    T2(Przetworzenie zawartości wejścia)
+    T3(Wygenerowanie ngramu dla wejścia)
+    T4(Obliczenie prawdopodobieństwa wystąpienia n-gramu dla ngramu referencyjnego)
+    T5(Obliczenie wyniku testu)
+    T6(Wypisanie wyniku testu na standardowe wyjście)
+
+    A --> B
+    B --> C
+    C --> D
+
+    D --> |Szyfrowanie| S1 --> S2 --> S3 --> S4 --> F
+    D --> |Deszyfrowanie| D1 --> D2 --> D3 --> D4 --> F
+    D --> |Generowanie n-gramu| G1 --> G2 --> G3 --> G4 --> G5 --> F
+    D --> |Odczytywanie n-gramu| O1 --> O2 --> O3 --> O4 --> F
+    D --> |Test x^2| T1 --> T2 --> T3 --> T4 --> T5 --> T6 --> F
+```
+
 ### Zadanie 1
 
 Korzystając z języka Rust, dokonaj implementacji programu szyfrującego i deszyfrującego zadany tekst.
