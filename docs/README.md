@@ -66,61 +66,167 @@ Korzystając z języka Rust, dokonaj implementacji programu szyfrującego i desz
 Kod źródłowy pliku main.rs
 
 ``` Rust
+mod args;
+mod converters;
+mod file_handling;
+mod file_parsers;
+mod generators;
+mod operating_mode;
+mod operations;
+
+use crate::args::Args;
+use crate::operating_mode::OperatingMode;
+use clap::Parser;
+
+/// Entrypoint that parses CLI arguments, validates them and dispatches the
+/// selected operating mode.
 fn main() {
     let args = Args::parse();
+    args.validate().expect("Validation failed");
 
-    let input = Path::new(&args.input);
-    if input.extension().and_then(|ext| ext.to_str()) != Some("txt") {
-        panic!("Only files with .txt extension are supported.");
+    let operating_mode = args.operating_mode();
+
+    match operating_mode {
+        OperatingMode::Encryption => {
+            operations::encryption_decryption(args, operating_mode);
+        }
+        OperatingMode::Decryption => {
+            operations::encryption_decryption(args, operating_mode);
+        }
+        OperatingMode::NgramGenerator => {
+            operations::ngram_generator(args);
+        }
+        OperatingMode::NgramReader => {
+            operations::ngram_reader(args);
+        }
+        OperatingMode::X2Test => {
+            operations::x2test(args);
+        }
     }
-
-    let output = Path::new(&args.output);
-    if output.extension().and_then(|ext| ext.to_str()) != Some("txt") {
-        panic!("Only files with .txt extension are supported.");
-    }
-
-    let key = Path::new(&args.key);
-    if key.extension().and_then(|ext| ext.to_str()) != Some("txt") {
-        panic!("Only files with .txt extension are supported.");
-    }
-
-    let operating_mode = match (args.mode_group.decrypt, args.mode_group.encrypt) {
-        (true, false) => OperatingMode::DECRYPTION,
-        (false, true) => OperatingMode::ENCRYPTION,
-        (_, _) => panic!("Only one operating mode can be selected at a time.")
-    };
-
-    let input = OpenOptions::new()
-        .read(true)
-        .open(input)
-        .expect("Failed to open input file");
-
-    let mut output = OpenOptions::new()
-        .write(true)
-        .create(true)
-        .truncate(true)
-        .open(output)
-        .expect("Failed to open output file");
-
-    let key = OpenOptions::new()
-        .read(true)
-        .open(key)
-        .expect("Failed to open key file");
-
-    let input = input_parser(input);
-    let key = key_parser(key, operating_mode);
-
-    output
-        .write_all(input.as_bytes())
-        .expect(format!("Could not write to output file at: {:?}.", output).as_str());
 }
+
 ```
 
-Kod źródłowy zawiera główne składowe programu
-- co jest wejściem funkcji
-- co jest wyjściem funkcji
-- co implementuje dana funkcja
+Kod źródłowy pliku main.rs zawiera jedną funckję main()
+- funkcja nie przyjmuje argumentów wejścia
+- funkcja nie zwraca żadnych wartości
+- funkcja implementuje działanie całego programu zależnie od wybranych przez użytownika flag
 
+Kod źródłowy pliku main.rs
+
+``` Rust
+use crate::operating_mode::OperatingMode;
+use crate::operating_mode::OperatingMode::{
+    Decryption, Encryption, NgramGenerator, NgramReader, X2Test,
+};
+use clap::ArgGroup;
+use std::path::PathBuf;
+
+/// Command line arguments accepted by the application.
+#[derive(clap::Parser, Debug)]
+#[command(version, about, long_about = None)]
+#[command(group = ArgGroup::new("mode").args(["encrypt", "decrypt", "gram", "read_ngram"]))]
+#[command(group = ArgGroup::new("ngram-file").args(["gram", "read_ngram"]))]
+pub struct Args {
+    /// Path to input file.
+    #[arg(short, long, value_name = "FILE")]
+    pub input: Option<PathBuf>,
+    /// Path to output file.
+    #[arg(short, long, value_name = "FILE")]
+    pub output: Option<PathBuf>,
+    /// Path to key file.
+    #[arg(short, long, value_name = "FILE")]
+    pub key: Option<PathBuf>,
+    /// Program operation mode.
+    #[clap(flatten)]
+    pub mode_group: ModeGroup,
+
+    /// Path to ngram file.
+    #[arg(value_name = "FILE", requires = "ngram-file")]
+    pub ngram_file: Option<PathBuf>,
+}
+
+/// Flags that identify the operating mode in which the application should run.
+#[derive(clap::Args, Debug)]
+pub struct ModeGroup {
+    /// Encryption mode.
+    #[arg(short, long, requires_all = ["input", "output", "key"])]
+    pub encrypt: bool,
+    /// Decryption mode.
+    #[arg(short, long, requires_all = ["input", "output", "key"])]
+    pub decrypt: bool,
+    /// Ngram generation mode.
+    #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4), requires_all = ["input"]
+    )]
+    pub gram: Option<u8>,
+    /// Ngram reading mode.
+    #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4))]
+    pub read_ngram: Option<u8>,
+    /// Generating x^2 test.
+    #[arg(short, requires_all = ["read_ngram", "input"])]
+    pub s: bool,
+}
+
+impl Args {
+    /// Performs basic validation of the supplied paths and flags.
+    pub fn validate(&self) -> Result<(), String> {
+        // Ensure that each path argument uses a supported file extension.
+        self.validate_paths()?;
+
+        Ok(())
+    }
+
+    /// Determines which operating mode should be executed based on the provided flags.
+    pub fn operating_mode(&self) -> OperatingMode {
+        // Translate the clap-generated booleans into simple aliases for readability.
+        let e = self.mode_group.encrypt;
+        let d = self.mode_group.decrypt;
+        let n = self.mode_group.gram.is_some();
+        let r = self.mode_group.read_ngram.is_some();
+        let s = self.mode_group.s;
+
+        // Map the mutually exclusive combinations of flags to their semantic meaning.
+        match (e, d, n, r, s) {
+            (true, false, false, false, false) => Encryption,
+            (false, true, false, false, false) => Decryption,
+            (false, false, true, false, false) => NgramGenerator,
+            (false, false, false, true, false) => NgramReader,
+            (false, false, false, true, true) => X2Test,
+            _ => panic!("Impossible combination of flags"),
+        }
+    }
+
+    /// Validates that every provided path points to a `.txt` file.
+    fn validate_paths(&self) -> Result<(), String> {
+        if let Some(input) = &self.input {
+            if input.extension().and_then(|ext| ext.to_str()) != Some("txt") {
+                return Err("Only files with .txt extension are supported.".into());
+            }
+        }
+
+        if let Some(output) = &self.output {
+            if output.extension().and_then(|ext| ext.to_str()) != Some("txt") {
+                return Err("Only files with .txt extension are supported.".into());
+            }
+        }
+
+        if let Some(key) = &self.key {
+            if key.extension().and_then(|ext| ext.to_str()) != Some("txt") {
+                return Err("Only files with .txt extension are supported.".into());
+            }
+        }
+
+        Ok(())
+    }
+}
+
+```
+
+Kod zawiera 2 struktury i 3 funkcje <br>
+Struktura Args{}
+-Przechowuje dane przekazywane przy wywołaniu programu. Dane to: ścieżka do pliku wejściowego, ścieżka zapisu pliku wyjściowego, plik klucza oraz flagi sterujące działaniem programu.
+-Sprawdza czy ścieżki do plików podane w argumencie zawierają wspierane rozszerzenia plików (validate() i validate_paths())
+-
 #### Wyniki
 
 W tej sekcji powinny być przedstawione wyniki pracy programu
