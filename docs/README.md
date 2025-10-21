@@ -195,11 +195,11 @@ impl Args {
 }
 
 ```
-Kod zawiera 2 struktury i 3 funkcje
-1. Struktura Args{}
- - Przechowuje dane przekazywane przy wywołaniu programu. Dane to: ścieżka do pliku wejściowego, ścieżka zapisu pliku wyjściowego, plik klucza oraz flagi sterujące działaniem programu.
- - Sprawdza czy ścieżki do plików podane w argumencie zawierają wspierane rozszerzenia plików (validate() i validate_paths())
- - test
+Funkcje zawarte w implementacji args:
+1. validate i validate_paths
+- Przyjmuje referencję do struktury args.
+- Zwraca status ok, jeśli nie napotka prolemów lub błąd, jeśli plik nie będzie miał rozszerzenia .txt.
+
 2. ss
 3. 
 #### Wyniki
