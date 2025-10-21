@@ -63,7 +63,7 @@ Korzystając z języka Rust, dokonaj implementacji programu szyfrującego i desz
     
 #### Implementacja
 
-Kod źródłowy pliku main.rs
+Kod źródłowy pliku ```main.rs```
 
 ``` Rust
 mod args;
@@ -107,12 +107,12 @@ fn main() {
 
 ```
 
-Kod źródłowy pliku main.rs zawiera jedną funckję main()
+Kod źródłowy pliku ```main.rs``` zawiera jedną funckję ```main()```
 - funkcja nie przyjmuje argumentów wejścia
 - funkcja nie zwraca żadnych wartości
 - funkcja implementuje działanie całego programu zależnie od wybranych przez użytownika flag
 
-Kod źródłowy struktury args[] i jej implementacji.
+Kod źródłowy struktury ```args[]``` i jej implementacji.
 
 ``` Rust
 pub struct Args {
@@ -135,7 +135,7 @@ pub struct Args {
 }
 
 ```
-struktura args przechowuje informacje o plikach, które zostaną wykorzystane w programie. Poniżej znajduje się lista tych pliów:
+Struktura ```args{}``` przechowuje informacje o plikach, które zostaną wykorzystane w programie. Poniżej znajduje się lista tych pliów:
 - Ścieżka do odczytu plku zawierającego tekst jawny lub zaszyfrowany.
 - Ścieżka do pliku przechowującego odszyfrowany lub zaszyfrowany tekst.
 - Ścieżka do pliku zawierającego klucz szyfrująct.
@@ -196,12 +196,39 @@ impl Args {
 
 ```
 Funkcje zawarte w implementacji args:
-1. validate i validate_paths
-- Przyjmuje referencję do struktury args.
+1. ```validate()``` i ```validate_paths()```
+- Przyjmuje referencję do struktury ```args[]```.
 - Zwraca status ok, jeśli nie napotka prolemów lub błąd, jeśli plik nie będzie miał rozszerzenia .txt.
+- Funkcja sprawdza, czy wszystkie podane pliki są z rozszerzeniem .txt.
 
-2. ss
-3. 
+2. ```operating_Mode```
+- Pobiera argumenty ze struktury ```ModeGroup{}```.
+- Zwraca polecenie, które powinien wywołać program.
+- Funckja tłumaczy flagi podane pry wywołaniu programu, tak by funkcja ```main()``` wywołała odpowiednie działania.
+Kod źródłowy struktury ```ModeGroup{}```
+``` Rust
+#[derive(clap::Args, Debug)]
+pub struct ModeGroup {
+    /// Encryption mode.
+    #[arg(short, long, requires_all = ["input", "output", "key"])]
+    pub encrypt: bool,
+    /// Decryption mode.
+    #[arg(short, long, requires_all = ["input", "output", "key"])]
+    pub decrypt: bool,
+    /// Ngram generation mode.
+    #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4), requires_all = ["input"]
+    )]
+    pub gram: Option<u8>,
+    /// Ngram reading mode.
+    #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4))]
+    pub read_ngram: Option<u8>,
+    /// Generating x^2 test.
+    #[arg(short, requires_all = ["read_ngram", "input"])]
+    pub s: bool,
+}
+```
+
+Struktura ```ModeGroup{}``` przechowuje flagi odpowiedzialne za wywoływanie konkretnych działań programu. Jest to struktura pomocnicza dla struktury```args{}```
 #### Wyniki
 
 W tej sekcji powinny być przedstawione wyniki pracy programu
