@@ -112,21 +112,9 @@ Kod źródłowy pliku main.rs zawiera jedną funckję main()
 - funkcja nie zwraca żadnych wartości
 - funkcja implementuje działanie całego programu zależnie od wybranych przez użytownika flag
 
-Kod źródłowy pliku main.rs
+Kod źródłowy struktury args[] i jej implementacji.
 
 ``` Rust
-use crate::operating_mode::OperatingMode;
-use crate::operating_mode::OperatingMode::{
-    Decryption, Encryption, NgramGenerator, NgramReader, X2Test,
-};
-use clap::ArgGroup;
-use std::path::PathBuf;
-
-/// Command line arguments accepted by the application.
-#[derive(clap::Parser, Debug)]
-#[command(version, about, long_about = None)]
-#[command(group = ArgGroup::new("mode").args(["encrypt", "decrypt", "gram", "read_ngram"]))]
-#[command(group = ArgGroup::new("ngram-file").args(["gram", "read_ngram"]))]
 pub struct Args {
     /// Path to input file.
     #[arg(short, long, value_name = "FILE")]
@@ -146,27 +134,13 @@ pub struct Args {
     pub ngram_file: Option<PathBuf>,
 }
 
-/// Flags that identify the operating mode in which the application should run.
-#[derive(clap::Args, Debug)]
-pub struct ModeGroup {
-    /// Encryption mode.
-    #[arg(short, long, requires_all = ["input", "output", "key"])]
-    pub encrypt: bool,
-    /// Decryption mode.
-    #[arg(short, long, requires_all = ["input", "output", "key"])]
-    pub decrypt: bool,
-    /// Ngram generation mode.
-    #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4), requires_all = ["input"]
-    )]
-    pub gram: Option<u8>,
-    /// Ngram reading mode.
-    #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4))]
-    pub read_ngram: Option<u8>,
-    /// Generating x^2 test.
-    #[arg(short, requires_all = ["read_ngram", "input"])]
-    pub s: bool,
-}
-
+```
+struktura args przechowuje informacje o plikach, które zostaną wykorzystane w programie. Poniżej znajduje się lista tych pliów:
+- Ścieżka do odczytu plku zawierającego tekst jawny lub zaszyfrowany.
+- Ścieżka do pliku przechowującego odszyfrowany lub zaszyfrowany tekst.
+- Ścieżka do pliku zawierającego klucz szyfrująct.
+- Flagę odpowiadającą za wybranie odpowiedniej funckji programu.
+``` Rust
 impl Args {
     /// Performs basic validation of the supplied paths and flags.
     pub fn validate(&self) -> Result<(), String> {
@@ -221,7 +195,6 @@ impl Args {
 }
 
 ```
-
 Kod zawiera 2 struktury i 3 funkcje
 1. Struktura Args{}
  - Przechowuje dane przekazywane przy wywołaniu programu. Dane to: ścieżka do pliku wejściowego, ścieżka zapisu pliku wyjściowego, plik klucza oraz flagi sterujące działaniem programu.
