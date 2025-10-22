@@ -39,11 +39,10 @@ pub struct ModeGroup {
     #[arg(short, long, requires_all = ["input", "output", "key"])]
     pub decrypt: bool,
     /// Ngram generation mode.
-    #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4), requires_all = ["input"]
-    )]
+    #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4), requires_all = ["input", "ngram-file"])]
     pub gram: Option<u8>,
     /// Ngram reading mode.
-    #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4))]
+    #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4), requires_all = ["ngram-file"])]
     pub read_ngram: Option<u8>,
     /// Generating x^2 test.
     #[arg(short, requires_all = ["read_ngram", "input"])]
