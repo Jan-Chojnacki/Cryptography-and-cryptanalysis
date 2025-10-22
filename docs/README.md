@@ -205,6 +205,7 @@ Funkcje zawarte w implementacji args:
 - Pobiera argumenty ze struktury ```ModeGroup{}```.
 - Zwraca polecenie, które powinien wywołać program.
 - Funckja tłumaczy flagi podane pry wywołaniu programu, tak by funkcja ```main()``` wywołała odpowiednie działania.
+
 Kod źródłowy struktury ```ModeGroup{}```
 ``` Rust
 #[derive(clap::Args, Debug)]
@@ -229,6 +230,104 @@ pub struct ModeGroup {
 ```
 
 Struktura ```ModeGroup{}``` przechowuje flagi odpowiedzialne za wywoływanie konkretnych działań programu. Jest to struktura pomocnicza dla struktury```args{}```
+
+Kod źródłlwy funkcji ```encrytpion_decryption()```
+``` Rust
+pub fn encryption_decryption(args: Args, operating_mode: OperatingMode) {
+    // Extract the required file paths from the parsed arguments.
+    let input = args.input.unwrap();
+    let output = args.output.unwrap();
+    let key = args.key.unwrap();
+
+    // Obtain handles to the plaintext, output and substitution key files.
+    let input = open_input(input).expect("Failed to open input file");
+    let output = open_output(output).expect("Failed to open output file");
+    let key = open_key(key).expect("Failed to open key file");
+
+    // Parse the raw files into their in-memory representations.
+    let input = input_parser(input);
+    let key = key_parser(key, &operating_mode);
+
+    // Substitute each character according to the key mapping.
+    let buf: String = input.chars().map(|x| key.get(&x).unwrap()).collect();
+
+    // Persist the transformed text to the requested destination.
+    save_to_file(&buf, output);
+}
+```
+- Funkcja przyjmuje strukturę ```args``` oraz typ enumarate odpowiedzialny za tryb prac programu.
+- Funkcja nie zwraca żadnych wartości.
+- Funkcja przygotowuje, otwiera i wprowadza do pamięci wymagane pliki, a następnie przy pomocy funkcji ```key_parser``` i ```input_parser```zamienia znaki w pliku zgodnie z podanym kluczem. Na końcu funkcja zapisuje wynik swojej pracy.
+
+
+Kod źródłowy funkcji ```input_parser```
+```Rust
+pub fn input_parser(input: File) -> String {
+    let reader = BufReader::new(input);
+    let mut buf: Vec<String> = Vec::new();
+
+    for line in reader.lines() {
+        if let Ok(line) = line {
+            // Keep only ASCII alphabetic characters and normalise their case.
+            let filtered_string: String =
+                line.chars().filter(|c| c.is_ascii_alphabetic()).collect();
+            buf.push(filtered_string.to_uppercase())
+        }
+    }
+
+    buf.join("")
+}
+```
+- Funkcja przyjmuje otwarty plik.
+- Funkcja zwraca łańcuch znaków.
+- Funkcja przetwarza dane z pliku i zamieina wszystkie litery alfabetu na duże litery.
+
+Kod źródłowy funkcji ```key_parser```
+```Rust
+pub fn key_parser(key: File, mode: &OperatingMode) -> HashMap<char, char> {
+    let mut map: HashMap<char, char> = HashMap::new();
+    let reader = BufReader::new(key);
+
+    for line in reader.lines() {
+        if let Ok(line) = line {
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() != 2 {
+                panic!("Invalid key format.")
+            }
+            match mode {
+                OperatingMode::Encryption => {
+                    // In encryption mode the file lists plaintext to ciphertext pairs.
+                    let key = parts[0].chars().next().unwrap();
+                    let value = parts[1].chars().next().unwrap();
+                    map.insert(key, value);
+                }
+                OperatingMode::Decryption => {
+                    // In decryption mode the mapping is inverted to translate ciphertext back to plaintext.
+                    let key = parts[1].chars().next().unwrap();
+                    let value = parts[0].chars().next().unwrap();
+                    map.insert(key, value);
+                }
+                _ => {}
+            }
+        }
+    }
+
+    // Validate that all letters are represented once both as keys and values.
+    let key_test: HashSet<char> = map.iter().map(|(&k, _)| k).collect();
+    let value_test: HashSet<char> = map.iter().map(|(_, &v)| v).collect();
+
+    if key_test.len() != 26 || value_test.len() != 26 {
+        panic!("Invalid key values.")
+    }
+
+    map
+}
+
+```
+- Funkcja przymuje jako argumenty otwarty plik klucza oraz tryb pracy.
+- Funkcja zwraca mapę wartości zawierającą pary klucz wartość typu char.
+- Dla trybu ```Encryption``` funkcja zamienia znaki z otwartego tekstu jawnego na odpowiadające im wartości zgodne z kluczem.
+- Dla trybu ```Decryption``` funkcja zamienia znaki z otwartego zaszyfrowanego teksty na odpowiadające im wartości zgodne z kluczem.
 #### Wyniki
 
 W tej sekcji powinny być przedstawione wyniki pracy programu
