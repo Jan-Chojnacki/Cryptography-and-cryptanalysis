@@ -424,7 +424,7 @@ pub fn histogram_generator(ngram: Vec<String>) -> Vec<(String, u64)> {
 ```
 - Funkcja przyjmuje w argumencie wektor typu string wygenerowany przez funkcję ``crate::generators::ngram_generator``.
 - Funkcja zwraca wektor zawierający parę wartości, string z n-gramem oraz ilość jego wystąpień w analizowanym tekście.
-- Funkcja iteruje po n-gramie, jeśli napotkany element nie istniał, dodaje go do mapy i ustawia licznik na zero, następnie zwiększa licznik o 1 z każdym wystąpieniem elementu.
+- Funkcja iteruje po wektorze n-gramów, jeśli napotkany element nie istniał, dodaje go do mapy i ustawia licznik na zero, następnie zwiększa licznik o 1 z każdym wystąpieniem elementu.
 Dalej konwertuje mapę na wektor. Na końcu sortuje wartości w wekotrze od największej do najmniejszej i zwraca go.
 #### Wyniki
 
