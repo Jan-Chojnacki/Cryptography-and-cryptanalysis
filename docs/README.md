@@ -426,6 +426,18 @@ pub fn histogram_generator(ngram: Vec<String>) -> Vec<(String, u64)> {
 - Funkcja zwraca wektor zawierający parę wartości, string z n-gramem oraz ilość jego wystąpień w analizowanym tekście.
 - Funkcja iteruje po wektorze n-gramów, jeśli napotkany element nie istniał, dodaje go do mapy i ustawia licznik na zero, następnie zwiększa licznik o 1 z każdym wystąpieniem elementu.
 Dalej konwertuje mapę na wektor. Na końcu sortuje wartości w wekotrze od największej do najmniejszej i zwraca go.
+
+Kod źródłowy funkcji ```ngram_to_string```
+```Rust
+pub fn ngram_to_string<T: Display>(input: Vec<(String, T)>) -> String {
+   // Format each entry as "GRAM: VALUE" and concatenate the lines into a single string.
+   input
+           .iter()
+           .map(|(k, v)| format!("{k}: {v}"))
+           .collect::<Vec<_>>()
+           .join("\n")
+}
+```
 #### Wyniki
 
 W tej sekcji powinny być przedstawione wyniki pracy programu
