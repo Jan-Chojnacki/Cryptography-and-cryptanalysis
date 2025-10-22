@@ -662,6 +662,12 @@ Wyniki
 ./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r3 english_trigrams.txt 
 3102.87288484137070554425
 
+./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r3 Reduced_trigrams.txt 
+3102.81211819119334904826
+
+./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r3 Reduced_trigrams.txt 
+3102.81211819119334904826
+
 ./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r3 english_trigrams.txt 
 3102.87288484137070554425
 ```
@@ -673,6 +679,12 @@ Wyniki
 ./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r4 english_quadgrams.txt 
 6380.06156763081344251987
 
-```
+./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r4 Reduced_quadgrams.txt 
+6380.02816471075766457943
 
-Wyniki powinny być zinterpretowane.
+./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r4 Reduced_quadgrams.txt 
+6380.02816471075766457943
+
+
+```
+Wyniki funkcji x^2 dla tekstu jawnego oraz odpowiadającego mu tekstu zaszyfrowanego są takie same, skrócenie n-gramów zmniejsza wynik.
