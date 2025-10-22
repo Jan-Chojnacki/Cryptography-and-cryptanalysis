@@ -438,6 +438,10 @@ pub fn ngram_to_string<T: Display>(input: Vec<(String, T)>) -> String {
            .join("\n")
 }
 ```
+
+- Funkcja przyjmuje w argumencie wektor pary wartości typu string i generycznego typu T.
+- Funkcja zwraca wartość typu string.
+- Funkcja zamienia wektor zawierający n-gramy na wartość typu string. Następnie łączy wszystkie wartości w jednolity tekst, gdzie każdy n-gram jest zapisany w osobnej linii, wraz z ilością jego wystąpień. 
 #### Wyniki
 
 W tej sekcji powinny być przedstawione wyniki pracy programu
