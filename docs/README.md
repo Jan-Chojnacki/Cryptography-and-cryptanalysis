@@ -341,6 +341,7 @@ LNFDSCYFWLUMLFAHFSUFHCCRCPQOJWFTQVEFALMSFTJABCAVFSOQAVLNJTFHCCRJTPCSLNFMTFCPQAXC
 
 Przykład działania programu uruchomionego z flagą -e w celu odszyfrowania danych
 ```shell
+
 ./target/debug/Cryptography-and-cryptanalysis -o output2.txt  -k key.txt -i output.txt -d
 head -c 100 output2.txt
 THEPROJECTGUTENBERGEBOOKOFALICESADVENTURESINWONDERLANDTHISEBOOKISFORTHEUSEOFANYONEANYWHEREINTHEUNITE
@@ -456,24 +457,19 @@ pub fn ngram_to_string<T: Display>(input: Vec<(String, T)>) -> String {
 Działanie programu do generowania n-gramów. W tym przypadku w argumencie wpisano liczbę 2.
 
 ```sh
+
 ./target/debug/Cryptography-and-cryptanalysis -g2 -i alice_wonderland.txt 2-grams.txt 
-HE: 4041
-TH: 4040
-ER: 2300
-IN: 2284
-AN: 1804
-OU: 1720
-IT: 1536
-ND: 1450
-AT: 1409
-RE: 1404
-TO: 1366
-ED: 1365
-HA: 1352
-EA: 1350
-ON: 1333
-ES: 1324
-EN: 1272
+HE 4041
+TH 4040
+ER 2300
+IN 2284
+AN 1804
+OU 1720
+IT 1536
+ND 1450
+AT 1409
+RE 1404
+
 
 ```
 
@@ -485,27 +481,89 @@ Uzupełnij program z poprzedniego zadania, tak aby w przypadku podania flagi -rX
 zbioru {1, 2, 3, 4} a następnie nazwy pliku, program odczytywał z niego referencyjną bazę n-gramów. Liczby z
 podanego zbioru odpowiadają: {mono-gramom, bi-gramom, tri-gramom, quad-gramom}.
 
+Następnie należy rozbudować program, tak aby podanie flagi -s generowało wartość testu χ2 dla zadanego tekstu (flaga
+-i) i wybranej bazy referencyjnej (flaga -rX). Wynik działania programu powinien być drukowany na standardowe
+wyjście.
+
 #### Implementacja
 
-Implementacja powinna przedstawiać kod źródłowy programu.
+Kod źródłowy funkcji ```ngram_reader```.
 
-``` Rust
-fn main() {
-    println!("Hello, world!");
+```Rust
+pub fn ngram_reader(args: Args) {
+    // Retrieve the histogram path and its associated n-gram size.
+    let input = args.ngram_file.unwrap();
+    let ngram_size = args.mode_group.read_ngram.unwrap();
+
+    // Load and parse the histogram file to recover its probability distribution.
+    let ngram = open_ngram(input).expect("Failed to open ngram file");
+
+    let ngram = ngram_parser(ngram, ngram_size);
+
+    println!("{}", ngram_to_string(ngram));
 }
 ```
 
-Kod źródłowy powinien być podzielony na części (definicje i funkcje). Każdy fragment programu powinien być opisany:
-- co jest wejściem funkcji
-- co jest wyjściem funkcji
-- co implementuje dana funkcja
+- Funkcja przyjmuje w argumencie ścieżkę do pliku z zapisanym histogramem n-gramów oraz ich rozmiar.
+- Funkcja nic nie zwraca.
+- Funkcja w pierwszej kolejności wczytuje informacje o n-gramach: ścieżkę do pliku oraz wielkość n-gramu. Następnie otwiera ngram i przy pomocy funkcji ```ngram_parser``` oblicza prawdopodobieństwo wystąpienia n-gramu, a następnie wypisuje go.
 
+
+Kod źródłowy funkcji ```ngram_parser```.
+```Rust
+pub fn ngram_parser(ngram: File, n: u8) -> Vec<(String, f64)> {
+    let mut map: Vec<(String, u64)> = Vec::new();
+    let reader = BufReader::new(ngram);
+
+    let mut sum: u64 = 0;
+
+    for line in reader.lines() {
+        if let Ok(line) = line {
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() != 2 {
+                panic!("Invalid ngram format.")
+            }
+            let key = parts[0].to_string();
+            let value = u64::from_str(parts[1]).unwrap();
+            if key.len() != n as usize {
+                dbg!(key);
+                panic!("Invalid ngram format.")
+            }
+
+            // Track the raw occurrence count before normalising to probabilities.
+            map.push((key, value));
+            sum += value;
+        }
+    }
+
+    // Convert each raw count to a probability using the total number of observations.
+    map.iter()
+        .map(|(k, v)| (k.clone(), *v as f64 / sum as f64))
+        .collect()
+}
+```
+- Funkcja przyjmuje otwarty plik z n-gramami.
+- Funcka zwraca wektor pary n-gram i prawdopodobieństwo jego wystąpienia.
+- Funkcja iteruje po wektorze zliczając ilość wszystkich n-gramów, a następnie oblicza prawdopodobieństwo dla każdego n-gramu występującego w tekście.
 #### Wyniki
 
 W tej sekcji powinny być przedstawione wyniki pracy programu
 
-``` sh
-RESULT
+```sh
+
+./target/debug/Cryptography-and-cryptanalysis -r2 2-grams.txt
+HE 0.032762828256621884
+TH 0.03275472065249998
+ER 0.018647489480383653
+IN 0.018517767814433157
+AN 0.014626117835918308
+OU 0.013945079089678208
+IT 0.012453279931247518
+ND 0.011756025976763607
+AT 0.011423614207765463
+RE 0.011383076187155934
+
+
 ```
 
 Wyniki powinny być zinterpretowane.
