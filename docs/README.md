@@ -351,8 +351,28 @@ cjonalność ta powinna być wyzwalana poprzez dodanie do programu jednej z nast
 Implementacja powinna przedstawiać kod źródłowy programu.
 
 ``` Rust
-fn main() {
-    println!("Hello, world!");
+pub fn ngram_generator(args: Args) {
+    // Gather the input path, output destination and requested n-gram size.
+    let input = args.input.unwrap();
+    let output = args.ngram_file.unwrap();
+    let ngram_size = args.mode_group.gram.unwrap();
+
+    // Read the plaintext input and prepare the output file.
+    let input = open_input(input).expect("Failed to open input file");
+    let output = open_output(output).expect("Failed to open output file");
+
+    // Normalise the plaintext prior to n-gram extraction.
+    let input = input_parser(input);
+
+    // Build the n-gram list, convert it into a histogram and serialise the result.
+    let ngram = crate::generators::ngram_generator(&input, ngram_size);
+    let histogram = histogram_generator(ngram);
+    let buf = ngram_to_string(histogram);
+
+    println!("{buf}");
+
+    // Write the histogram to disk for later use.
+    save_to_file(&buf, output);
 }
 ```
 
