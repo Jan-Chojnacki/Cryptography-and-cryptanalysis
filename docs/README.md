@@ -376,17 +376,61 @@ pub fn ngram_generator(args: Args) {
 }
 ```
 
-Kod źródłowy powinien być podzielony na części (definicje i funkcje). Każdy fragment programu powinien być opisany:
 - Funkcja przyjmuje w argumencie strukturę ```args{}```.
 - Funkcja nie zwraca żadnych wartości.
 - Funkcja w pierwszej kolejności przygotowuje dane: odpakowuje je, a następnie otwiera pliki wejścia oraz wyjścia. Kolejno przetwarza otwarty plik funkcją ```input_parser```
 tak, żeby zawierał jedynie duże litery alfabetu. Następnie przy pomocy funkcji ```ngram_generator()``` z modułu ```generators``` tworzy histogramy wystąpień n-gramów, przy pomocy funkcji ```hisogram_generator()```. Dalej zapisuje histogram do bufora i wypisuje go. Na końcu zapisuje wspomniany bufor do pliku wyjściowego.
 
+
+Kod źródłowy funkcji ```ngram_generator()``` z modułu ```generators.rs```
+```Rust
+   pub fn ngram_generator(input: &str, ngram_size: u8) -> Vec<String> {
+   // Slide over the bytes to capture every n-length subsequence.
+   input
+           .as_bytes()
+           .windows(ngram_size as usize)
+           .map(|w| String::from_utf8_lossy(w).to_string())
+           .collect()
+}
+```
+- Funkcja przyjmuje w argumencie odwołanie do łańcucha znaków oraz długość n-gramu.
+- Funkcja zwraca wektor typu string.
+- Funkcja dzieli tekst wejściowy na bity, następnie tworzy iterator po wszystkich nakładających się elementach o długości podanej w argumencie, kolejno konwertuje buty z powrotem na typ string, a na końcu zapisuje wyniki do wektora, który zwraca.
+
+Kod źródłowy funkcji ```histogram_generator```
+```Rust
+pub fn histogram_generator(ngram: Vec<String>) -> Vec<(String, u64)> {
+    // Count occurrences of each n-gram using a hash map accumulator.
+    let mut res = ngram
+        .iter()
+        .fold(HashMap::new(), |mut acc, gram| {
+            *acc.entry(gram.clone()).or_insert(0) += 1;
+            acc
+        })
+        // Move the aggregated counts into a vector to preserve ordering requirements.
+        .iter()
+        .fold(Vec::new(), |mut acc, (k, v)| {
+            acc.push((k.clone(), *v));
+            acc
+        });
+
+    // Sort the histogram by frequency in descending order.
+    res.sort_by_key(|&(_, v)| v);
+    res.reverse();
+
+    res
+}
+
+```
+- Funkcja przyjmuje w argumencie wektor typu string wygenerowany przez funkcję ``crate::generators::ngram_generator``.
+- Funkcja zwraca wektor zawierający parę wartości, string z n-gramem oraz ilość jego wystąpień w analizowanym tekście.
+- Funkcja iteruje po n-gramie, jeśli napotkany element nie istniał, dodaje go do mapy i ustawia licznik na zero, następnie zwiększa licznik o 1 z każdym wystąpieniem elementu.
+Dalej konwertuje mapę na wektor. Na końcu sortuje wartości w wekotrze od największej do najmniejszej i zwraca go.
 #### Wyniki
 
 W tej sekcji powinny być przedstawione wyniki pracy programu
 
-``` sh
+```sh
 RESULT
 ```
 
