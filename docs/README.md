@@ -348,7 +348,7 @@ cjonalność ta powinna być wyzwalana poprzez dodanie do programu jednej z nast
 
 #### Implementacja
 
-Implementacja powinna przedstawiać kod źródłowy programu.
+Kod źródłowy funkcji ```ngram_generator```
 
 ``` Rust
 pub fn ngram_generator(args: Args) {
@@ -377,9 +377,10 @@ pub fn ngram_generator(args: Args) {
 ```
 
 Kod źródłowy powinien być podzielony na części (definicje i funkcje). Każdy fragment programu powinien być opisany:
-- co jest wejściem funkcji
-- co jest wyjściem funkcji
-- co implementuje dana funkcja
+- Funkcja przyjmuje w argumencie strukturę ```args{}```.
+- Funkcja nie zwraca żadnych wartości.
+- Funkcja w pierwszej kolejności przygotowuje dane: odpakowuje je, a następnie otwiera pliki wejścia oraz wyjścia. Kolejno przetwarza otwarty plik funkcją ```input_parser```
+tak, żeby zawierał jedynie duże litery alfabetu. Następnie przy pomocy funkcji ```ngram_generator()``` z modułu ```generators``` tworzy histogramy wystąpień n-gramów, przy pomocy funkcji ```hisogram_generator()```. Dalej zapisuje histogram do bufora i wypisuje go. Na końcu zapisuje wspomniany bufor do pliku wyjściowego.
 
 #### Wyniki
 
