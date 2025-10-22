@@ -3,7 +3,7 @@
 ### Grupa 1ID24B
 ### Autorzy: Jakub Babiarski, Jan Chojnacki
 
-``` mermaid
+```mermaid
 flowchart TD
     A[Wejście]
     B(Odczytywanie i walidacja poprawności kombinacji argumentów)
@@ -65,7 +65,7 @@ Korzystając z języka Rust, dokonaj implementacji programu szyfrującego i desz
 
 Kod źródłowy pliku ```main.rs```
 
-``` Rust
+```Rust
 mod args;
 mod converters;
 mod file_handling;
@@ -114,7 +114,7 @@ Kod źródłowy pliku ```main.rs``` zawiera jedną funckję ```main()```
 
 Kod źródłowy struktury ```args[]``` i jej implementacji.
 
-``` Rust
+```Rust
 pub struct Args {
     /// Path to input file.
     #[arg(short, long, value_name = "FILE")]
@@ -140,7 +140,7 @@ Struktura ```args{}``` przechowuje informacje o plikach, które zostaną wykorzy
 - Ścieżka do pliku przechowującego odszyfrowany lub zaszyfrowany tekst.
 - Ścieżka do pliku zawierającego klucz szyfrująct.
 - Flagę odpowiadającą za wybranie odpowiedniej funckji programu.
-``` Rust
+```Rust
 impl Args {
     /// Performs basic validation of the supplied paths and flags.
     pub fn validate(&self) -> Result<(), String> {
@@ -207,7 +207,7 @@ Funkcje zawarte w implementacji args:
 - Funckja tłumaczy flagi podane pry wywołaniu programu, tak by funkcja ```main()``` wywołała odpowiednie działania.
 
 Kod źródłowy struktury ```ModeGroup{}```
-``` Rust
+```Rust
 #[derive(clap::Args, Debug)]
 pub struct ModeGroup {
     /// Encryption mode.
@@ -232,7 +232,7 @@ pub struct ModeGroup {
 Struktura ```ModeGroup{}``` przechowuje flagi odpowiedzialne za wywoływanie konkretnych działań programu. Jest to struktura pomocnicza dla struktury```args{}```
 
 Kod źródłlwy funkcji ```encrytpion_decryption()```
-``` Rust
+```Rust
 pub fn encryption_decryption(args: Args, operating_mode: OperatingMode) {
     // Extract the required file paths from the parsed arguments.
     let input = args.input.unwrap();
@@ -330,13 +330,22 @@ pub fn key_parser(key: File, mode: &OperatingMode) -> HashMap<char, char> {
 - Dla trybu ```Decryption``` funkcja zamienia znaki z otwartego zaszyfrowanego teksty na odpowiadające im wartości zgodne z kluczem.
 #### Wyniki
 
-W tej sekcji powinny być przedstawione wyniki pracy programu
+Przykład działania programu uruchomionego z flagą -e w celu zaszyfrowania danych
 
-``` sh
-RESULT
+```sh
+
+./target/debug/Cryptography-and-cryptanalysis -i alice_wonderland.txt  -k key.txt -o output.txt -e
+head -c 100 output.txt
+LNFDSCYFWLUMLFAHFSUFHCCRCPQOJWFTQVEFALMSFTJABCAVFSOQAVLNJTFHCCRJTPCSLNFMTFCPQAXCAFQAXBNFSFJALNFMAJLF
 ```
 
-Wyniki powinny być zinterpretowane.
+Przykład działania programu uruchomionego z flagą -e w celu odszyfrowania danych
+```shell
+./target/debug/Cryptography-and-cryptanalysis -o output2.txt  -k key.txt -i output.txt -d
+head -c 100 output2.txt
+THEPROJECTGUTENBERGEBOOKOFALICESADVENTURESINWONDERLANDTHISEBOOKISFORTHEUSEOFANYONEANYWHEREINTHEUNITE
+```
+Program działa bez zarzutów, poprawnie szyfruje oraz deszyfruje tekst. W obu powyższych przypadkach został zastosowany ten sam plik klucza, co dowodzi poprwaności działania programu. Flagi sterujące działaniem programu można umieszczać w dowolnej kolejności, co spełnia założenia projektowe programu.
 
 ### Zadanie 2
 
@@ -350,7 +359,7 @@ cjonalność ta powinna być wyzwalana poprzez dodanie do programu jednej z nast
 
 Kod źródłowy funkcji ```ngram_generator```
 
-``` Rust
+```Rust
 pub fn ngram_generator(args: Args) {
     // Gather the input path, output destination and requested n-gram size.
     let input = args.input.unwrap();
@@ -444,15 +453,37 @@ pub fn ngram_to_string<T: Display>(input: Vec<(String, T)>) -> String {
 - Funkcja zamienia wektor zawierający n-gramy na wartość typu string. Następnie łączy wszystkie wartości w jednolity tekst, gdzie każdy n-gram jest zapisany w osobnej linii, wraz z ilością jego wystąpień. 
 #### Wyniki
 
-W tej sekcji powinny być przedstawione wyniki pracy programu
+Działanie programu do generowania n-gramów. W tym przypadku w argumencie wpisano liczbę 2.
 
 ```sh
-RESULT
+./target/debug/Cryptography-and-cryptanalysis -g2 -i alice_wonderland.txt 2-grams.txt 
+HE: 4041
+TH: 4040
+ER: 2300
+IN: 2284
+AN: 1804
+OU: 1720
+IT: 1536
+ND: 1450
+AT: 1409
+RE: 1404
+TO: 1366
+ED: 1365
+HA: 1352
+EA: 1350
+ON: 1333
+ES: 1324
+EN: 1272
+
 ```
 
 Wyniki powinny być zinterpretowane.
 
 ### Zadanie 3
+
+Uzupełnij program z poprzedniego zadania, tak aby w przypadku podania flagi -rX, gdzie X jest liczbą należącą do
+zbioru {1, 2, 3, 4} a następnie nazwy pliku, program odczytywał z niego referencyjną bazę n-gramów. Liczby z
+podanego zbioru odpowiadają: {mono-gramom, bi-gramom, tri-gramom, quad-gramom}.
 
 #### Implementacja
 
