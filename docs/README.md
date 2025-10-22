@@ -547,7 +547,7 @@ pub fn ngram_parser(ngram: File, n: u8) -> Vec<(String, f64)> {
 - Funkcja iteruje po wektorze zliczając ilość wszystkich n-gramów, a następnie oblicza prawdopodobieństwo dla każdego n-gramu występującego w tekście.
 #### Wyniki
 
-W tej sekcji powinny być przedstawione wyniki pracy programu
+
 
 ```sh
 
@@ -566,31 +566,113 @@ RE 0.011383076187155934
 
 ```
 
-Wyniki powinny być zinterpretowane.
+Program poprawnie wypisuje prawdopodobieństwo wystąpienia n-gramu w pliku.
 
-### Zadanie 4
+```Rust
+pub fn x2test(args: Args) {
+    // Obtain the ciphertext path, reference histogram and the n-gram size used for comparison.
+    let input = args.input.unwrap();
+    let ngram_ref = args.ngram_file.unwrap();
+    let ngram_size = args.mode_group.read_ngram.unwrap();
 
-#### Implementacja
+    // Parse the ciphertext and compute its histogram for the requested n-gram length.
+    let input = open_input(input).expect("Failed to open input file");
 
-Implementacja powinna przedstawiać kod źródłowy programu.
+    let input = input_parser(input);
+    let ngram = crate::generators::ngram_generator(&input, ngram_size);
+    let ngram = histogram_generator(ngram);
 
-``` Rust
-fn main() {
-    println!("Hello, world!");
+    // Load the reference histogram used as the expected distribution.
+    let ngram_ref = open_ngram(ngram_ref).expect("Failed to open ngram file");
+    let ngram_ref = ngram_parser(ngram_ref, ngram_size);
+
+    let mut sum: f64 = 0.0;
+
+    // Total number of observed n-grams in the analysed text.
+    let n: u64 = ngram.iter().map(|(_, num)| num).sum();
+
+    // Apply the chi-squared formula across each n-gram observation.
+    for i in 0..ngram.len() {
+        let e = ngram_ref[i].1 * n as f64;
+        sum += (ngram[i].1 as f64 - e).powi(2) / e
+    }
+
+    // Output the resulting chi-squared statistic for downstream analysis.
+    println!("{sum:.20}")
 }
 ```
+- Funkcja przyjmuje za argumenty strukturę, wykorzystuje z niej ścieżkę do pliku tekstu wejściowego, ścieżkę do pliku zawierającego n-gramy oraz jego rozmiar.
+- Funkcja nic nie zwraca.
+- Funkcja przygotowuje pliki do analizy, otwiera je i usuwa zbędne znaki (np. spacje) i skleja całość w jeden ciąg znaków. Następnie tworzy z tego pliku histogram n-gramów, który porównuje z histogramem podanym w argumencie funkcji. Następnie oblicza wartość testu x^2 dla podanych plików. 
+```shell
 
-Kod źródłowy powinien być podzielony na części (definicje i funkcje). Każdy fragment programu powinien być opisany:
-- co jest wejściem funkcji
-- co jest wyjściem funkcji
-- co implementuje dana funkcja
+./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r2 2-grams.txt
+0.00000000000000000000
+
+```
+Program poprawnie porównuje n-gram z plikiem tekstu jawnego. Wynik 0 oznacza, że pliki są takie same, co jest prawdą, ponieważ plik ```2-grams.txt``` został wygenerowany na podstawie pliku ```alice_wonderlands```. Poniżej przedstawiono przykład dla n-gramu, który nie jest powiązany z plikiem źródłowym.
+
+```shell
+
+./target/debug/Cryptography-and-cryptanalysis -s -i fairytale.txt -r2 english_bigrams.txt 
+12181.52784371924099104945
+
+```
+
+### Zadanie 4
+- Dokonaj obserwacji wyniku testu χ2 dla tekstu jawnego i zaszyfrowanego o różnych długościach.
+- Wiadomo, iż wynik testu może być znacząco zaburzony w przypadku gdy brane są pod uwagę symbole (n-gramy),
+  które rzadko występują w tekście, np w przypadku mono-gramów języka angielskiego są to litery: J, K, Q, X oraz
+  Z (patrz odczytana tablica częstości mono-gramów). Zbadaj wynik testu χ2 w przypadku gdy do wyznaczenia
+  testu pominięte zostaną rzadko występujące n-gramy
 
 #### Wyniki
 
-W tej sekcji powinny być przedstawione wyniki pracy programu
+Wyniki
 
-``` sh
-RESULT
+```sh
+
+./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r2 2-grams.txt
+0.00000000000000000000
+
+./target/debug/Cryptography-and-cryptanalysis -s -i fairytale.txt -r2 english_bigrams.txt 
+12181.52784371924099104945
+
+./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r1 english_monograms.txt 
+599.09697433246287801012
+```
+
+```sh
+
+./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r2 english_bigrams.txt 
+1210.95027642850368465588
+
+./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r2 english_bigrams.txt 
+1210.95027642850368465588
+
+./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r2 Reduced_bigrams.txt 
+1210.92697753112520331342
+
+./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r2 Reduced_bigrams.txt 
+1210.92697753112520331342
+
+```
+```sh
+
+./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r3 english_trigrams.txt 
+3102.87288484137070554425
+
+./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r3 english_trigrams.txt 
+3102.87288484137070554425
+```
+```sh
+
+./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r4 english_quadgrams.txt 
+6380.06156763081344251987
+
+./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r4 english_quadgrams.txt 
+6380.06156763081344251987
+
 ```
 
 Wyniki powinny być zinterpretowane.
