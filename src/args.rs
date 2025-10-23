@@ -1,9 +1,8 @@
 use crate::operating_mode::OperatingMode;
-use crate::operating_mode::OperatingMode::{
-    Decryption, Encryption, NgramGenerator, NgramReader, X2Test,
-};
+use crate::operating_mode::OperatingMode::{Attack, Decryption, Encryption, NgramGenerator, NgramReader, X2Test};
 use clap::ArgGroup;
 use std::path::PathBuf;
+use crate::attacks::Attack as AttackEnum;
 
 /// Command line arguments accepted by the application.
 #[derive(clap::Parser, Debug)]
@@ -47,6 +46,9 @@ pub struct ModeGroup {
     /// Generating x^2 test.
     #[arg(short, requires_all = ["read_ngram", "input"])]
     pub s: bool,
+    /// Attack mode.
+    #[arg(short, long)]
+    pub attack: Option<AttackEnum>,
 }
 
 impl Args {
@@ -66,14 +68,16 @@ impl Args {
         let n = self.mode_group.gram.is_some();
         let r = self.mode_group.read_ngram.is_some();
         let s = self.mode_group.s;
+        let a = self.mode_group.attack.is_some();
 
         // Map the mutually exclusive combinations of flags to their semantic meaning.
-        match (e, d, n, r, s) {
-            (true, false, false, false, false) => Encryption,
-            (false, true, false, false, false) => Decryption,
-            (false, false, true, false, false) => NgramGenerator,
-            (false, false, false, true, false) => NgramReader,
-            (false, false, false, true, true) => X2Test,
+        match (e, d, n, r, s, a) {
+            (true, false, false, false, false, false) => Encryption,
+            (false, true, false, false, false, false) => Decryption,
+            (false, false, true, false, false, false) => NgramGenerator,
+            (false, false, false, true, false, false) => NgramReader,
+            (false, false, false, true, true, false) => X2Test,
+            (false, false, false, false, false, true) => Attack,
             _ => panic!("Impossible combination of flags"),
         }
     }

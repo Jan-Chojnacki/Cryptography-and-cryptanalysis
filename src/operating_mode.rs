@@ -6,4 +6,5 @@ pub enum OperatingMode {
     NgramGenerator,
     NgramReader,
     X2Test,
+    Attack,
 }

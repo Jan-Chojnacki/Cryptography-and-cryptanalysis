@@ -5,6 +5,7 @@ mod file_parsers;
 mod generators;
 mod operating_mode;
 mod operations;
+mod attacks;
 
 use crate::args::Args;
 use crate::operating_mode::OperatingMode;
@@ -33,6 +34,9 @@ fn main() {
         }
         OperatingMode::X2Test => {
             operations::x2test(args);
+        }
+        OperatingMode::Attack => {
+            operations::attack(args);
         }
     }
 }
