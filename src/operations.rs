@@ -1,3 +1,4 @@
+use statrs::distribution::{ChiSquared, ContinuousCDF};
 use crate::args::Args;
 use crate::converters::ngram_to_string;
 use crate::file_handling::{open_input, open_key, open_ngram, open_output, save_to_file};
@@ -98,4 +99,10 @@ pub fn x2test(args: Args) {
 
     // Output the resulting chi-squared statistic for downstream analysis.
     println!("{sum:.20}")
+}
+
+pub fn attack(args: Args) {
+    let df = 1.0;
+    let cfd = ChiSquared::new(df).expect("TODO: panic message");
+    let icfd = cfd.inverse_cdf(0.95);
 }
