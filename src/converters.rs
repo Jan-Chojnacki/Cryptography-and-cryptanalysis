@@ -1,7 +1,8 @@
+use std::collections::HashMap;
 use std::fmt::Display;
 
 /// Serialises an n-gram histogram into a newline separated `key: value` list.
-pub fn ngram_to_string<T: Display>(input: Vec<(String, T)>) -> String {
+pub fn ngram_to_string<T: Display>(input: HashMap<String, T>) -> String {
     // Format each entry as "GRAM: VALUE" and concatenate the lines into a single string.
     input
         .iter()

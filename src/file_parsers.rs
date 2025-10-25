@@ -1,4 +1,3 @@
-use crate::operating_mode::OperatingMode;
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -22,7 +21,7 @@ pub fn input_parser(input: File) -> String {
 }
 
 /// Parses the substitution key file into a mapping tailored to the requested operating mode.
-pub fn key_parser(key: File, mode: &OperatingMode) -> HashMap<char, char> {
+pub fn key_parser(key: File, decryption: bool) -> HashMap<char, char> {
     let mut map: HashMap<char, char> = HashMap::new();
     let reader = BufReader::new(key);
 
@@ -32,20 +31,19 @@ pub fn key_parser(key: File, mode: &OperatingMode) -> HashMap<char, char> {
             if parts.len() != 2 {
                 panic!("Invalid key format.")
             }
-            match mode {
-                OperatingMode::Encryption => {
+            match decryption {
+                false => {
                     // In encryption mode the file lists plaintext to ciphertext pairs.
                     let key = parts[0].chars().next().unwrap();
                     let value = parts[1].chars().next().unwrap();
                     map.insert(key, value);
                 }
-                OperatingMode::Decryption => {
+                true => {
                     // In decryption mode the mapping is inverted to translate ciphertext back to plaintext.
                     let key = parts[1].chars().next().unwrap();
                     let value = parts[0].chars().next().unwrap();
                     map.insert(key, value);
                 }
-                _ => {}
             }
         }
     }
@@ -62,7 +60,7 @@ pub fn key_parser(key: File, mode: &OperatingMode) -> HashMap<char, char> {
 }
 
 /// Reads an n-gram frequency file and converts the counts into probabilities.
-pub fn ngram_parser(ngram: File, n: u8) -> Vec<(String, f64)> {
+pub fn ngram_parser(ngram: File, n: u8) -> HashMap<String, f64> {
     let mut map: Vec<(String, u64)> = Vec::new();
     let reader = BufReader::new(ngram);
 

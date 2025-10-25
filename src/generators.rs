@@ -11,24 +11,11 @@ pub fn ngram_generator(input: &str, ngram_size: u8) -> Vec<String> {
 }
 
 /// Aggregates a collection of n-grams into a histogram sorted by frequency.
-pub fn histogram_generator(ngram: Vec<String>) -> Vec<(String, u64)> {
-    // Count occurrences of each n-gram using a hash map accumulator.
-    let mut res = ngram
+pub fn histogram_generator(ngram: Vec<String>) -> HashMap<String, u64> {
+    ngram
         .iter()
-        .fold(HashMap::new(), |mut acc, gram| {
+        .fold(HashMap::<String, u64>::new(), |mut acc, gram| {
             *acc.entry(gram.clone()).or_insert(0) += 1;
             acc
         })
-        // Move the aggregated counts into a vector to preserve ordering requirements.
-        .iter()
-        .fold(Vec::new(), |mut acc, (k, v)| {
-            acc.push((k.clone(), *v));
-            acc
-        });
-
-    // Sort the histogram by frequency in descending order.
-    res.sort_by_key(|&(_, v)| v);
-    res.reverse();
-
-    res
 }
