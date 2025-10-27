@@ -72,7 +72,7 @@ pub fn x2test(input: PathBuf, file: PathBuf, r: u8) {
     let mut k_used = 0usize;
 
     // Total number of observed n-grams in the analysed text.
-    let n: u64 = ngram.iter().map(|(_, num)| num).sum();
+    let n: u64 = ngram.values().sum();
 
     // Apply the chi-squared formula across each n-gram observation.
     for (k, v) in ngram {
