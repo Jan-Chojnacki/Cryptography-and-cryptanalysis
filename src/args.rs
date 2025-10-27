@@ -9,22 +9,15 @@ pub struct Args {
     pub commands: Commands,
 }
 #[derive(Subcommand, Debug)]
+#[command(infer_subcommands = true)]
 pub enum Commands {
     Encrypt {
-        #[arg(short, long, value_name = "FILE")]
-        input: PathBuf,
-        #[arg(short, long, value_name = "FILE")]
-        output: PathBuf,
-        #[arg(short, long, value_name = "FILE")]
-        key: PathBuf,
+        #[command(subcommand)]
+        algorithm: Algorithm,
     },
     Decrypt {
-        #[arg(short, long, value_name = "FILE")]
-        input: PathBuf,
-        #[arg(short, long, value_name = "FILE")]
-        output: PathBuf,
-        #[arg(short, long, value_name = "FILE")]
-        key: PathBuf,
+        #[command(subcommand)]
+        algorithm: Algorithm,
     },
     Ngram {
         #[command(subcommand)]
@@ -59,4 +52,39 @@ pub enum NgramCommands {
         #[arg(value_name = "FILE")]
         file: PathBuf,
     },
+}
+
+#[derive(Subcommand, Debug)]
+pub enum Algorithm {
+    Substitution {
+        #[clap(flatten)]
+        args: EncryptionDecryptionArgsKeyText,
+    },
+    Cesar {
+        #[clap(flatten)]
+        args: EncryptionDecryptionArgsKeyNumeric,
+    },
+    Affine {
+
+    },
+}
+
+#[derive(clap::Args, Debug)]
+pub struct EncryptionDecryptionArgsKeyText {
+    #[arg(short, long, value_name = "FILE")]
+    pub input: PathBuf,
+    #[arg(short, long, value_name = "FILE")]
+    pub output: PathBuf,
+    #[arg(short, long, value_name = "FILE")]
+    pub key: PathBuf,
+}
+
+#[derive(clap::Args, Debug)]
+pub struct EncryptionDecryptionArgsKeyNumeric {
+    #[arg(short, long, value_name = "FILE")]
+    pub input: PathBuf,
+    #[arg(short, long, value_name = "FILE")]
+    pub output: PathBuf,
+    #[arg(short, long, value_name = "FILE")]
+    pub key: PathBuf,
 }

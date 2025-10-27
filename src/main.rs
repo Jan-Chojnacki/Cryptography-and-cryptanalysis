@@ -6,7 +6,7 @@ mod file_parsers;
 mod generators;
 mod operations;
 
-use crate::args::{Args, Commands, NgramCommands};
+use crate::args::{Algorithm, Args, Commands, EncryptionDecryptionArgsKeyText, NgramCommands};
 use clap::Parser;
 
 /// Entrypoint that parses CLI arguments, validates them and dispatches the
@@ -15,12 +15,22 @@ fn main() {
     let args = Args::parse();
 
     match args.commands {
-        Commands::Encrypt { input, output, key } => {
-            operations::encryption_decryption(input, output, key, false);
-        }
-        Commands::Decrypt { input, output, key } => {
-            operations::encryption_decryption(input, output, key, true);
-        }
+        Commands::Encrypt { algorithm } => match algorithm {
+            Algorithm::Substitution { args } => {
+                let EncryptionDecryptionArgsKeyText { input, output, key } = args;
+                operations::encryption_decryption(input, output, key, false);
+            }
+            Algorithm::Cesar { args } => {}
+            Algorithm::Affine {} => {}
+        },
+        Commands::Decrypt { algorithm } => match algorithm {
+            Algorithm::Substitution { args } => {
+                let EncryptionDecryptionArgsKeyText { input, output, key } = args;
+                operations::encryption_decryption(input, output, key, true);
+            }
+            Algorithm::Cesar { args } => {}
+            Algorithm::Affine {} => {}
+        },
         Commands::Ngram { ngram_commands } => match ngram_commands {
             NgramCommands::Generate { g, input, file } => {
                 operations::ngram_generator(input, file, g);
