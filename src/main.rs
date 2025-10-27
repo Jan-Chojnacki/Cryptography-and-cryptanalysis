@@ -1,3 +1,4 @@
+mod algorithms;
 mod args;
 mod attacks;
 mod converters;
@@ -6,6 +7,7 @@ mod file_parsers;
 mod generators;
 mod operations;
 
+use crate::algorithms::*;
 use crate::args::{Algorithm, Args, Commands, EncryptionDecryptionArgsKeyText, NgramCommands};
 use clap::Parser;
 
@@ -18,7 +20,7 @@ fn main() {
         Commands::Encrypt { algorithm } => match algorithm {
             Algorithm::Substitution { args } => {
                 let EncryptionDecryptionArgsKeyText { input, output, key } = args;
-                operations::encryption_decryption(input, output, key, false);
+                substitution::handle_encrypt(input, output, key);
             }
             Algorithm::Cesar { args } => {}
             Algorithm::Affine {} => {}
@@ -26,7 +28,7 @@ fn main() {
         Commands::Decrypt { algorithm } => match algorithm {
             Algorithm::Substitution { args } => {
                 let EncryptionDecryptionArgsKeyText { input, output, key } = args;
-                operations::encryption_decryption(input, output, key, true);
+                substitution::handle_decrypt(input, output, key);
             }
             Algorithm::Cesar { args } => {}
             Algorithm::Affine {} => {}

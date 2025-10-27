@@ -5,24 +5,6 @@ use crate::file_handling::{open_input, open_key, open_ngram, open_output, save_t
 use crate::file_parsers::{input_parser, key_parser, ngram_parser};
 use crate::generators::histogram_generator;
 
-/// Executes the classical substitution cipher in either encryption or decryption mode.
-pub fn encryption_decryption(input: PathBuf, output: PathBuf, key: PathBuf, decryption: bool) {
-    // Obtain handles to the plaintext, output and substitution key files.
-    let input = open_input(input).expect("Failed to open input file");
-    let output = open_output(output).expect("Failed to open output file");
-    let key = open_key(key).expect("Failed to open key file");
-
-    // Parse the raw files into their in-memory representations.
-    let input = input_parser(input);
-    let key = key_parser(key, decryption);
-
-    // Substitute each character according to the key mapping.
-    let buf: String = input.chars().map(|x| key.get(&x).unwrap()).collect();
-
-    // Persist the transformed text to the requested destination.
-    save_to_file(&buf, output);
-}
-
 /// Generates an n-gram histogram from an input file and stores it in both stdout and a file.
 pub fn ngram_generator(input: PathBuf, file: Option<PathBuf>, g: u8) {
     // Read the plaintext input.
