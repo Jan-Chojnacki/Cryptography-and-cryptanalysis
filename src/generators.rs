@@ -20,7 +20,7 @@ pub fn histogram_generator(ngram: Vec<String>) -> HashMap<String, u64> {
         })
 }
 
-pub fn generate_transposition_key(n: i32) -> HashMap<char, char>{
+pub fn generate_transposition_key(n: i16) -> HashMap<char, char>{
     let mut key = HashMap::with_capacity(26);
     let shift: u8 = ((n + 26) % 26) as u8;
 

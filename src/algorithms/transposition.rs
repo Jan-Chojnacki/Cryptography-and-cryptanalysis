@@ -11,7 +11,8 @@ pub fn handle_encrypt(input: PathBuf, output: PathBuf, key: u8) {
 
     // Parse the raw files into their in-memory representations.
     let input = input_parser(input);
-    let key = generate_transposition_key(key as i32);
+
+    let key = generate_transposition_key(key as i16);
 
     // Substitute each character according to the key mapping.
     let buf: String = encrypt(&input, key);
@@ -31,7 +32,8 @@ pub fn handle_decrypt(input: PathBuf, output: PathBuf, key: u8) {
 
     // Parse the raw files into their in-memory representations.
     let input = input_parser(input);
-    let key = generate_transposition_key(-(key as i32));
+
+    let key = generate_transposition_key(-(key as i16));
 
     // Substitute each character according to the key mapping.
     let buf: String = decrypt(&input, key);
