@@ -26,7 +26,9 @@ fn main() {
                 let EncryptionDecryptionArgsKeyNumeric { input, output, key } = args;
                 transposition::handle_encrypt(input, output, key);
             }
-            Algorithm::Affine {} => {}
+            Algorithm::Affine {input, output, a, b} => {
+                affine::handle_encrypt(input, output, a, b);
+            }
         },
         Commands::Decrypt { algorithm } => match algorithm {
             Algorithm::Substitution { args } => {
@@ -37,7 +39,9 @@ fn main() {
                 let EncryptionDecryptionArgsKeyNumeric { input, output, key } = args;
                 transposition::handle_decrypt(input, output, key);
             }
-            Algorithm::Affine {} => {}
+            Algorithm::Affine {input, output, a, b} => {
+                affine::handle_decrypt(input, output, a, b);
+            }
         },
         Commands::Ngram { ngram_commands } => match ngram_commands {
             NgramCommands::Generate { g, input, file } => {

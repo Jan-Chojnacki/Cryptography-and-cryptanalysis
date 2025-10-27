@@ -23,9 +23,7 @@ pub enum Commands {
         #[command(subcommand)]
         ngram_commands: NgramCommands,
     },
-    Attack {
-
-    },
+    Attack {},
     Similarity {
         #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4))]
         r: u8,
@@ -33,7 +31,7 @@ pub enum Commands {
         file: PathBuf,
         #[arg(short, long, value_name = "FILE")]
         input: PathBuf,
-    }
+    },
 }
 
 #[derive(Subcommand, Debug)]
@@ -65,7 +63,14 @@ pub enum Algorithm {
         args: EncryptionDecryptionArgsKeyNumeric,
     },
     Affine {
-
+        #[arg(short, long, value_name = "FILE")]
+        input: PathBuf,
+        #[arg(short, long, value_name = "FILE")]
+        output: PathBuf,
+        #[arg(short, long)]
+        a: u32,
+        #[arg(short, long)]
+        b: u32,
     },
 }
 
