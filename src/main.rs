@@ -8,7 +8,7 @@ mod generators;
 mod operations;
 
 use crate::algorithms::*;
-use crate::args::{Algorithm, Args, Commands, EncryptionDecryptionArgsKeyText, NgramCommands};
+use crate::args::{Algorithm, Args, Commands, EncryptionDecryptionArgsKeyNumeric, EncryptionDecryptionArgsKeyText, NgramCommands};
 use clap::Parser;
 
 /// Entrypoint that parses CLI arguments, validates them and dispatches the
@@ -22,7 +22,10 @@ fn main() {
                 let EncryptionDecryptionArgsKeyText { input, output, key } = args;
                 substitution::handle_encrypt(input, output, key);
             }
-            Algorithm::Cesar { args } => {}
+            Algorithm::Transposition { args } => {
+                let EncryptionDecryptionArgsKeyNumeric { input, output, key } = args;
+                transposition::handle_encrypt(input, output, key);
+            }
             Algorithm::Affine {} => {}
         },
         Commands::Decrypt { algorithm } => match algorithm {
@@ -30,7 +33,10 @@ fn main() {
                 let EncryptionDecryptionArgsKeyText { input, output, key } = args;
                 substitution::handle_decrypt(input, output, key);
             }
-            Algorithm::Cesar { args } => {}
+            Algorithm::Transposition { args } => {
+                let EncryptionDecryptionArgsKeyNumeric { input, output, key } = args;
+                transposition::handle_decrypt(input, output, key);
+            }
             Algorithm::Affine {} => {}
         },
         Commands::Ngram { ngram_commands } => match ngram_commands {

@@ -1,8 +1,8 @@
 use std::path::PathBuf;
 use statrs::distribution::{ChiSquared, ContinuousCDF};
 use crate::converters::ngram_to_string;
-use crate::file_handling::{open_input, open_key, open_ngram, open_output, save_to_file};
-use crate::file_parsers::{input_parser, key_parser, ngram_parser};
+use crate::file_handling::{open_input, open_ngram, open_output, save_to_file};
+use crate::file_parsers::{input_parser, ngram_parser};
 use crate::generators::histogram_generator;
 
 /// Generates an n-gram histogram from an input file and stores it in both stdout and a file.

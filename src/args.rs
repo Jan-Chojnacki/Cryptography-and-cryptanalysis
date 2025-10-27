@@ -60,7 +60,7 @@ pub enum Algorithm {
         #[clap(flatten)]
         args: EncryptionDecryptionArgsKeyText,
     },
-    Cesar {
+    Transposition {
         #[clap(flatten)]
         args: EncryptionDecryptionArgsKeyNumeric,
     },
@@ -85,6 +85,6 @@ pub struct EncryptionDecryptionArgsKeyNumeric {
     pub input: PathBuf,
     #[arg(short, long, value_name = "FILE")]
     pub output: PathBuf,
-    #[arg(short, long, value_name = "FILE")]
-    pub key: PathBuf,
+    #[arg(short, long)]
+    pub key: u8,
 }
