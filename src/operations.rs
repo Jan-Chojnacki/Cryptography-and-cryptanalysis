@@ -69,7 +69,6 @@ pub fn x2test(input: PathBuf, file: PathBuf, r: u8) {
     let ngram_ref = ngram_parser(ngram_ref, r);
 
     let mut x2: f64 = 0.0;
-    let mut k_used = 0usize;
 
     // Total number of observed n-grams in the analysed text.
     let n: u64 = ngram.values().sum();
@@ -79,18 +78,14 @@ pub fn x2test(input: PathBuf, file: PathBuf, r: u8) {
         if let Some(rv) = ngram_ref.get(&k) {
             let e = rv * n as f64;
             x2 += (v as f64 - e).powi(2) / e;
-            k_used += 1;
         }
     }
 
-    let df = if k_used > 0 { (k_used as i64 - 1).max(1) as f64 } else { 1.0 };
-
-    let alpha: f64 = 0.05;
+    let df = 26.0f64.powi(r as i32) - 1.0;
 
     let chi = ChiSquared::new(df).expect("invalid degrees of freedom");
 
-    let q = (1.0 - alpha).clamp(1e-12, 1.0 - 1e-12);
-    let critical = chi.inverse_cdf(q);
+    let critical = chi.inverse_cdf(0.95f64);
 
     let reject_h0 = x2 >= critical;
 
