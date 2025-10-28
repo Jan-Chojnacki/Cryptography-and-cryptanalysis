@@ -13,17 +13,20 @@ pub struct Args {
 pub enum Commands {
     Encrypt {
         #[command(subcommand)]
-        algorithm: Algorithm,
+        algorithm_command: AlgorithmCommand,
     },
     Decrypt {
         #[command(subcommand)]
-        algorithm: Algorithm,
+        algorithm_command: AlgorithmCommand,
     },
     Ngram {
         #[command(subcommand)]
-        ngram_commands: NgramCommands,
+        ngram_command: NgramCommand,
     },
-    Attack {},
+    Attack {
+        #[command(subcommand)]
+        attack_command: AttackCommand,
+    },
     Similarity {
         #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4))]
         r: u8,
@@ -35,7 +38,7 @@ pub enum Commands {
 }
 
 #[derive(Subcommand, Debug)]
-pub enum NgramCommands {
+pub enum NgramCommand {
     Generate {
         #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4))]
         g: u8,
@@ -53,7 +56,7 @@ pub enum NgramCommands {
 }
 
 #[derive(Subcommand, Debug)]
-pub enum Algorithm {
+pub enum AlgorithmCommand {
     Substitution {
         #[arg(short, long, value_name = "FILE")]
         input: PathBuf,
@@ -67,7 +70,7 @@ pub enum Algorithm {
         input: PathBuf,
         #[arg(short, long, value_name = "FILE")]
         output: PathBuf,
-        #[arg(short, long)]
+        #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=25))]
         key: u8,
     },
     Affine {
@@ -79,5 +82,36 @@ pub enum Algorithm {
         a: u32,
         #[arg(short, long)]
         b: u32,
+    },
+}
+
+#[derive(Subcommand, Debug)]
+#[command(infer_subcommands = true)]
+pub enum AttackCommand {
+    BruteForce {
+        #[command(subcommand)]
+        algorithm: AttackAlgorithmCommand,
+    },
+}
+
+#[derive(Subcommand, Debug)]
+pub enum AttackAlgorithmCommand {
+    Substitution {
+        #[arg(short, long, value_name = "FILE")]
+        input: PathBuf,
+        #[arg(short, long, value_name = "FILE")]
+        output: PathBuf,
+    },
+    Transposition {
+        #[arg(short, long, value_name = "FILE")]
+        input: PathBuf,
+        #[arg(short, long, value_name = "FILE")]
+        output: PathBuf,
+    },
+    Affine {
+        #[arg(short, long, value_name = "FILE")]
+        input: PathBuf,
+        #[arg(short, long, value_name = "FILE")]
+        output: PathBuf,
     },
 }

@@ -8,7 +8,7 @@ mod generators;
 mod operations;
 
 use crate::algorithms::*;
-use crate::args::{Algorithm, Args, Commands, NgramCommands};
+use crate::args::{AlgorithmCommand, Args, AttackAlgorithmCommand, AttackCommand, Commands, NgramCommand};
 use clap::Parser;
 
 /// Entrypoint that parses CLI arguments, validates them and dispatches the
@@ -17,37 +17,59 @@ fn main() {
     let args = Args::parse();
 
     match args.commands {
-        Commands::Encrypt { algorithm } => match algorithm {
-            Algorithm::Substitution { input, output, key } => {
+        Commands::Encrypt { algorithm_command } => match algorithm_command {
+            AlgorithmCommand::Substitution { input, output, key } => {
                 substitution::handle_encrypt(input, output, key);
             }
-            Algorithm::Transposition { input, output, key } => {
+            AlgorithmCommand::Transposition { input, output, key } => {
                 transposition::handle_encrypt(input, output, key);
             }
-            Algorithm::Affine {input, output, a, b} => {
+            AlgorithmCommand::Affine {
+                input,
+                output,
+                a,
+                b,
+            } => {
                 affine::handle_encrypt(input, output, a, b);
             }
         },
-        Commands::Decrypt { algorithm } => match algorithm {
-            Algorithm::Substitution { input, output, key } => {
+        Commands::Decrypt { algorithm_command } => match algorithm_command {
+            AlgorithmCommand::Substitution { input, output, key } => {
                 substitution::handle_decrypt(input, output, key);
             }
-            Algorithm::Transposition { input, output, key } => {
+            AlgorithmCommand::Transposition { input, output, key } => {
                 transposition::handle_decrypt(input, output, key);
             }
-            Algorithm::Affine {input, output, a, b} => {
+            AlgorithmCommand::Affine {
+                input,
+                output,
+                a,
+                b,
+            } => {
                 affine::handle_decrypt(input, output, a, b);
             }
         },
-        Commands::Ngram { ngram_commands } => match ngram_commands {
-            NgramCommands::Generate { g, input, file } => {
+        Commands::Ngram { ngram_command } => match ngram_command {
+            NgramCommand::Generate { g, input, file } => {
                 operations::ngram_generator(input, file, g);
             }
-            NgramCommands::Read { r, file } => {
+            NgramCommand::Read { r, file } => {
                 operations::ngram_reader(file, r);
             }
         },
-        Commands::Attack { .. } => {}
+        Commands::Attack { attack_command } => match attack_command {
+            AttackCommand::BruteForce { algorithm } => match algorithm {
+                AttackAlgorithmCommand::Substitution { input, output } => {
+                    
+                }
+                AttackAlgorithmCommand::Transposition { input, output } => {
+                    
+                }
+                AttackAlgorithmCommand::Affine { input, output } => {
+                    
+                }
+            },
+        },
         Commands::Similarity { r, input, file } => {
             operations::x2test(input, file, r);
         }
