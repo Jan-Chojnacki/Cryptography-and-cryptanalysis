@@ -8,7 +8,7 @@ mod generators;
 mod operations;
 
 use crate::algorithms::*;
-use crate::args::{Algorithm, Args, Commands, EncryptionDecryptionArgsKeyNumeric, EncryptionDecryptionArgsKeyText, NgramCommands};
+use crate::args::{Algorithm, Args, Commands, NgramCommands};
 use clap::Parser;
 
 /// Entrypoint that parses CLI arguments, validates them and dispatches the
@@ -18,12 +18,10 @@ fn main() {
 
     match args.commands {
         Commands::Encrypt { algorithm } => match algorithm {
-            Algorithm::Substitution { args } => {
-                let EncryptionDecryptionArgsKeyText { input, output, key } = args;
+            Algorithm::Substitution { input, output, key } => {
                 substitution::handle_encrypt(input, output, key);
             }
-            Algorithm::Transposition { args } => {
-                let EncryptionDecryptionArgsKeyNumeric { input, output, key } = args;
+            Algorithm::Transposition { input, output, key } => {
                 transposition::handle_encrypt(input, output, key);
             }
             Algorithm::Affine {input, output, a, b} => {
@@ -31,12 +29,10 @@ fn main() {
             }
         },
         Commands::Decrypt { algorithm } => match algorithm {
-            Algorithm::Substitution { args } => {
-                let EncryptionDecryptionArgsKeyText { input, output, key } = args;
+            Algorithm::Substitution { input, output, key } => {
                 substitution::handle_decrypt(input, output, key);
             }
-            Algorithm::Transposition { args } => {
-                let EncryptionDecryptionArgsKeyNumeric { input, output, key } = args;
+            Algorithm::Transposition { input, output, key } => {
                 transposition::handle_decrypt(input, output, key);
             }
             Algorithm::Affine {input, output, a, b} => {

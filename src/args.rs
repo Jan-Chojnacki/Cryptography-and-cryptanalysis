@@ -55,12 +55,20 @@ pub enum NgramCommands {
 #[derive(Subcommand, Debug)]
 pub enum Algorithm {
     Substitution {
-        #[clap(flatten)]
-        args: EncryptionDecryptionArgsKeyText,
+        #[arg(short, long, value_name = "FILE")]
+        input: PathBuf,
+        #[arg(short, long, value_name = "FILE")]
+        output: PathBuf,
+        #[arg(short, long, value_name = "FILE")]
+        key: PathBuf,
     },
     Transposition {
-        #[clap(flatten)]
-        args: EncryptionDecryptionArgsKeyNumeric,
+        #[arg(short, long, value_name = "FILE")]
+        input: PathBuf,
+        #[arg(short, long, value_name = "FILE")]
+        output: PathBuf,
+        #[arg(short, long)]
+        key: u8,
     },
     Affine {
         #[arg(short, long, value_name = "FILE")]
@@ -72,24 +80,4 @@ pub enum Algorithm {
         #[arg(short, long)]
         b: u32,
     },
-}
-
-#[derive(clap::Args, Debug)]
-pub struct EncryptionDecryptionArgsKeyText {
-    #[arg(short, long, value_name = "FILE")]
-    pub input: PathBuf,
-    #[arg(short, long, value_name = "FILE")]
-    pub output: PathBuf,
-    #[arg(short, long, value_name = "FILE")]
-    pub key: PathBuf,
-}
-
-#[derive(clap::Args, Debug)]
-pub struct EncryptionDecryptionArgsKeyNumeric {
-    #[arg(short, long, value_name = "FILE")]
-    pub input: PathBuf,
-    #[arg(short, long, value_name = "FILE")]
-    pub output: PathBuf,
-    #[arg(short, long)]
-    pub key: u8,
 }
