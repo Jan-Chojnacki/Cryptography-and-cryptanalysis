@@ -1,9 +1,11 @@
 //! Operacje analityczne i narzędziowe wykorzystywane przez aplikację z poziomu CLI.
 
-use crate::converters::ngram_to_string;
+use crate::algorithms::input_parser::input_parser;
 use crate::file_handling::{open_input, open_ngram, open_output, save_to_file};
-use crate::file_parsers::{input_parser, ngram_parser};
-use crate::generators::histogram_generator;
+use crate::ngram::histogram_generator::histogram_generator;
+use crate::ngram::ngram_generator::ngram_generator;
+use crate::ngram::ngram_parser::ngram_parser;
+use crate::ngram::ngram_to_string::ngram_to_string;
 use statrs::distribution::{ChiSquared, ContinuousCDF};
 use std::path::PathBuf;
 
@@ -13,12 +15,12 @@ use std::path::PathBuf;
 /// * `input` - Ścieżka do pliku z tekstem poddawanym analizie n-gramowej.
 /// * `file` - Opcjonalna ścieżka do pliku wynikowego; `None` oznacza wyłącznie wypisanie w konsoli.
 /// * `g` - Rozmiar n-gramów wykorzystywanych podczas generowania statystyk.
-pub fn ngram_generator(input: PathBuf, file: Option<PathBuf>, g: u8) {
+pub fn handle_ngram_generate(input: PathBuf, file: Option<PathBuf>, g: u8) {
     let input = open_input(input).expect("Failed to open input file");
 
     let input = input_parser(input);
 
-    let ngram = crate::generators::ngram_generator(&input, g);
+    let ngram = ngram_generator(&input, g);
     let histogram = histogram_generator(ngram);
     let buf = ngram_to_string(histogram);
 
@@ -36,7 +38,7 @@ pub fn ngram_generator(input: PathBuf, file: Option<PathBuf>, g: u8) {
 /// # Arguments
 /// * `file` - Ścieżka do pliku z zapisanymi n-gramami w formacie tekstowym.
 /// * `r` - Rozmiar n-gramów wykorzystywany podczas analizy statystycznej.
-pub fn ngram_reader(file: PathBuf, r: u8) {
+pub fn handle_ngram_read(file: PathBuf, r: u8) {
     let ngram = open_ngram(file).expect("Failed to open ngram file");
 
     let ngram = ngram_parser(ngram, r);
@@ -50,11 +52,11 @@ pub fn ngram_reader(file: PathBuf, r: u8) {
 /// * `input` - Ścieżka do pliku z tekstem poddawanym analizie n-gramowej.
 /// * `file` - Ścieżka do pliku zawierającego referencyjne częstotliwości n-gramów.
 /// * `r` - Rozmiar n-gramów wykorzystywany podczas analizy statystycznej.
-pub fn x2test(input: PathBuf, file: PathBuf, r: u8) {
+pub fn handle_x2test(input: PathBuf, file: PathBuf, r: u8) {
     let input = open_input(input).expect("Failed to open input file");
 
     let input = input_parser(input);
-    let ngram = crate::generators::ngram_generator(&input, r);
+    let ngram = ngram_generator(&input, r);
     let ngram = histogram_generator(ngram);
 
     let ngram_ref = open_ngram(file).expect("Failed to open ngram file");

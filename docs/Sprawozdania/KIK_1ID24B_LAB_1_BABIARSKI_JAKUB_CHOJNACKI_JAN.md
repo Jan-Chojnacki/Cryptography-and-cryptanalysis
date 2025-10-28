@@ -1,6 +1,9 @@
 # Kryptografia i kryptoanaliza
+
 ## Laboratorium 1
+
 ### Grupa 1ID24B
+
 ### Autorzy: Jakub Babiarski, Jan Chojnacki
 
 ```mermaid
@@ -53,14 +56,15 @@ flowchart TD
 ### Zadanie 1
 
 Korzystając z języka Rust, dokonaj implementacji programu szyfrującego i deszyfrującego zadany tekst.
+
 1. Tekst jawny powinien być importowany do programu z pliku tekstowego, którego nazwa określona powinna być
-   po zdefiniowanym argumencie / fladze: -i. 
+   po zdefiniowanym argumencie / fladze: -i.
 2. Wynik pracy programu powinien być eksportowany do pliku tekstowego, którego nazwa określona powinna być
    po zdefiniowanym argumencie / fladze: -o.
 3. Klucz powinien być importowany z pliku tekstowego, którego nazwa powinna być określona po zdefiniowanym
    argumencie / fladze: -k.
-4.  Tryb pracy programu powinien być określony poprzez flagi: -e dla procesu szyfrowania, -d dla procesu deszyfrowania
-    
+4. Tryb pracy programu powinien być określony poprzez flagi: -e dla procesu szyfrowania, -d dla procesu deszyfrowania
+
 #### Implementacja
 
 Kod źródłowy pliku ```main.rs```
@@ -108,6 +112,7 @@ fn main() {
 ```
 
 Kod źródłowy pliku ```main.rs``` zawiera jedną funckję ```main()```
+
 - funkcja nie przyjmuje argumentów wejścia
 - funkcja nie zwraca żadnych wartości
 - funkcja implementuje działanie całego programu zależnie od wybranych przez użytownika flag
@@ -135,11 +140,15 @@ pub struct Args {
 }
 
 ```
-Struktura ```args{}``` przechowuje informacje o plikach, które zostaną wykorzystane w programie. Poniżej znajduje się lista tych pliów:
+
+Struktura ```args{}``` przechowuje informacje o plikach, które zostaną wykorzystane w programie. Poniżej znajduje się
+lista tych pliów:
+
 - Ścieżka do odczytu plku zawierającego tekst jawny lub zaszyfrowany.
 - Ścieżka do pliku przechowującego odszyfrowany lub zaszyfrowany tekst.
 - Ścieżka do pliku zawierającego klucz szyfrująct.
 - Flagę odpowiadającą za wybranie odpowiedniej funckji programu.
+
 ```Rust
 impl Args {
     /// Performs basic validation of the supplied paths and flags.
@@ -195,18 +204,23 @@ impl Args {
 }
 
 ```
+
 Funkcje zawarte w implementacji args:
+
 1. ```validate()``` i ```validate_paths()```
+
 - Przyjmuje referencję do struktury ```args[]```.
 - Zwraca status ok, jeśli nie napotka prolemów lub błąd, jeśli plik nie będzie miał rozszerzenia .txt.
 - Funkcja sprawdza, czy wszystkie podane pliki są z rozszerzeniem .txt.
 
 2. ```operating_Mode```
+
 - Pobiera argumenty ze struktury ```ModeGroup{}```.
 - Zwraca polecenie, które powinien wywołać program.
 - Funckja tłumaczy flagi podane pry wywołaniu programu, tak by funkcja ```main()``` wywołała odpowiednie działania.
 
 Kod źródłowy struktury ```ModeGroup{}```
+
 ```Rust
 #[derive(clap::Args, Debug)]
 pub struct ModeGroup {
@@ -229,9 +243,11 @@ pub struct ModeGroup {
 }
 ```
 
-Struktura ```ModeGroup{}``` przechowuje flagi odpowiedzialne za wywoływanie konkretnych działań programu. Jest to struktura pomocnicza dla struktury```args{}```
+Struktura ```ModeGroup{}``` przechowuje flagi odpowiedzialne za wywoływanie konkretnych działań programu. Jest to
+struktura pomocnicza dla struktury```args{}```
 
 Kod źródłlwy funkcji ```encrytpion_decryption()```
+
 ```Rust
 pub fn encryption_decryption(args: Args, operating_mode: OperatingMode) {
     // Extract the required file paths from the parsed arguments.
@@ -255,12 +271,14 @@ pub fn encryption_decryption(args: Args, operating_mode: OperatingMode) {
     save_to_file(&buf, output);
 }
 ```
+
 - Funkcja przyjmuje strukturę ```args``` oraz typ enumarate odpowiedzialny za tryb prac programu.
 - Funkcja nie zwraca żadnych wartości.
-- Funkcja przygotowuje, otwiera i wprowadza do pamięci wymagane pliki, a następnie przy pomocy funkcji ```key_parser``` i ```input_parser```zamienia znaki w pliku zgodnie z podanym kluczem. Na końcu funkcja zapisuje wynik swojej pracy.
-
+- Funkcja przygotowuje, otwiera i wprowadza do pamięci wymagane pliki, a następnie przy pomocy funkcji ```key_parser```
+  i ```input_parser```zamienia znaki w pliku zgodnie z podanym kluczem. Na końcu funkcja zapisuje wynik swojej pracy.
 
 Kod źródłowy funkcji ```input_parser```
+
 ```Rust
 pub fn input_parser(input: File) -> String {
     let reader = BufReader::new(input);
@@ -278,11 +296,13 @@ pub fn input_parser(input: File) -> String {
     buf.join("")
 }
 ```
+
 - Funkcja przyjmuje otwarty plik.
 - Funkcja zwraca łańcuch znaków.
 - Funkcja przetwarza dane z pliku i zamieina wszystkie litery alfabetu na duże litery.
 
 Kod źródłowy funkcji ```key_parser```
+
 ```Rust
 pub fn key_parser(key: File, mode: &OperatingMode) -> HashMap<char, char> {
     let mut map: HashMap<char, char> = HashMap::new();
@@ -324,10 +344,14 @@ pub fn key_parser(key: File, mode: &OperatingMode) -> HashMap<char, char> {
 }
 
 ```
+
 - Funkcja przymuje jako argumenty otwarty plik klucza oraz tryb pracy.
 - Funkcja zwraca mapę wartości zawierającą pary klucz wartość typu char.
-- Dla trybu ```Encryption``` funkcja zamienia znaki z otwartego tekstu jawnego na odpowiadające im wartości zgodne z kluczem.
-- Dla trybu ```Decryption``` funkcja zamienia znaki z otwartego zaszyfrowanego teksty na odpowiadające im wartości zgodne z kluczem.
+- Dla trybu ```Encryption``` funkcja zamienia znaki z otwartego tekstu jawnego na odpowiadające im wartości zgodne z
+  kluczem.
+- Dla trybu ```Decryption``` funkcja zamienia znaki z otwartego zaszyfrowanego teksty na odpowiadające im wartości
+  zgodne z kluczem.
+
 #### Wyniki
 
 Przykład działania programu uruchomionego z flagą -e w celu zaszyfrowania danych
@@ -340,13 +364,17 @@ LNFDSCYFWLUMLFAHFSUFHCCRCPQOJWFTQVEFALMSFTJABCAVFSOQAVLNJTFHCCRJTPCSLNFMTFCPQAXC
 ```
 
 Przykład działania programu uruchomionego z flagą -e w celu odszyfrowania danych
+
 ```shell
 
 ./target/debug/Cryptography-and-cryptanalysis -o output2.txt  -k key.txt -i output.txt -d
 head -c 100 output2.txt
 THEPROJECTGUTENBERGEBOOKOFALICESADVENTURESINWONDERLANDTHISEBOOKISFORTHEUSEOFANYONEANYWHEREINTHEUNITE
 ```
-Program działa bez zarzutów, poprawnie szyfruje oraz deszyfruje tekst. W obu powyższych przypadkach został zastosowany ten sam plik klucza, co dowodzi poprwaności działania programu. Flagi sterujące działaniem programu można umieszczać w dowolnej kolejności, co spełnia założenia projektowe programu.
+
+Program działa bez zarzutów, poprawnie szyfruje oraz deszyfruje tekst. W obu powyższych przypadkach został zastosowany
+ten sam plik klucza, co dowodzi poprwaności działania programu. Flagi sterujące działaniem programu można umieszczać w
+dowolnej kolejności, co spełnia założenia projektowe programu.
 
 ### Zadanie 2
 
@@ -388,26 +416,33 @@ pub fn ngram_generator(args: Args) {
 
 - Funkcja przyjmuje w argumencie strukturę ```args{}```.
 - Funkcja nie zwraca żadnych wartości.
-- Funkcja w pierwszej kolejności przygotowuje dane: odpakowuje je, a następnie otwiera pliki wejścia oraz wyjścia. Kolejno przetwarza otwarty plik funkcją ```input_parser```
-tak, żeby zawierał jedynie duże litery alfabetu. Następnie przy pomocy funkcji ```ngram_generator()``` z modułu ```generators``` tworzy histogramy wystąpień n-gramów, przy pomocy funkcji ```hisogram_generator()```. Dalej zapisuje histogram do bufora i wypisuje go. Na końcu zapisuje wspomniany bufor do pliku wyjściowego.
-
+- Funkcja w pierwszej kolejności przygotowuje dane: odpakowuje je, a następnie otwiera pliki wejścia oraz wyjścia.
+  Kolejno przetwarza otwarty plik funkcją ```input_parser```
+  tak, żeby zawierał jedynie duże litery alfabetu. Następnie przy pomocy funkcji ```ngram_generator()``` z modułu
+  ```generators``` tworzy histogramy wystąpień n-gramów, przy pomocy funkcji ```hisogram_generator()```. Dalej zapisuje
+  histogram do bufora i wypisuje go. Na końcu zapisuje wspomniany bufor do pliku wyjściowego.
 
 Kod źródłowy funkcji ```ngram_generator()``` z modułu ```generators.rs```
+
 ```Rust
    pub fn ngram_generator(input: &str, ngram_size: u8) -> Vec<String> {
-   // Slide over the bytes to capture every n-length subsequence.
-   input
-           .as_bytes()
-           .windows(ngram_size as usize)
-           .map(|w| String::from_utf8_lossy(w).to_string())
-           .collect()
+    // Slide over the bytes to capture every n-length subsequence.
+    input
+        .as_bytes()
+        .windows(ngram_size as usize)
+        .map(|w| String::from_utf8_lossy(w).to_string())
+        .collect()
 }
 ```
+
 - Funkcja przyjmuje w argumencie odwołanie do łańcucha znaków oraz długość n-gramu.
 - Funkcja zwraca wektor typu string.
-- Funkcja dzieli tekst wejściowy na bity, następnie tworzy iterator po wszystkich nakładających się elementach o długości podanej w argumencie, kolejno konwertuje buty z powrotem na typ string, a na końcu zapisuje wyniki do wektora, który zwraca.
+- Funkcja dzieli tekst wejściowy na bity, następnie tworzy iterator po wszystkich nakładających się elementach o
+  długości podanej w argumencie, kolejno konwertuje buty z powrotem na typ string, a na końcu zapisuje wyniki do
+  wektora, który zwraca.
 
 Kod źródłowy funkcji ```histogram_generator```
+
 ```Rust
 pub fn histogram_generator(ngram: Vec<String>) -> Vec<(String, u64)> {
     // Count occurrences of each n-gram using a hash map accumulator.
@@ -432,12 +467,15 @@ pub fn histogram_generator(ngram: Vec<String>) -> Vec<(String, u64)> {
 }
 
 ```
+
 - Funkcja przyjmuje w argumencie wektor typu string wygenerowany przez funkcję ``crate::generators::ngram_generator``.
 - Funkcja zwraca wektor zawierający parę wartości, string z n-gramem oraz ilość jego wystąpień w analizowanym tekście.
-- Funkcja iteruje po wektorze n-gramów, jeśli napotkany element nie istniał, dodaje go do mapy i ustawia licznik na zero, następnie zwiększa licznik o 1 z każdym wystąpieniem elementu.
-Dalej konwertuje mapę na wektor. Na końcu sortuje wartości w wekotrze od największej do najmniejszej i zwraca go.
+- Funkcja iteruje po wektorze n-gramów, jeśli napotkany element nie istniał, dodaje go do mapy i ustawia licznik na
+  zero, następnie zwiększa licznik o 1 z każdym wystąpieniem elementu.
+  Dalej konwertuje mapę na wektor. Na końcu sortuje wartości w wekotrze od największej do najmniejszej i zwraca go.
 
 Kod źródłowy funkcji ```ngram_to_string```
+
 ```Rust
 pub fn ngram_to_string<T: Display>(input: Vec<(String, T)>) -> String {
    // Format each entry as "GRAM: VALUE" and concatenate the lines into a single string.
@@ -451,7 +489,9 @@ pub fn ngram_to_string<T: Display>(input: Vec<(String, T)>) -> String {
 
 - Funkcja przyjmuje w argumencie wektor pary wartości typu string i generycznego typu T.
 - Funkcja zwraca wartość typu string.
-- Funkcja zamienia wektor zawierający n-gramy na wartość typu string. Następnie łączy wszystkie wartości w jednolity tekst, gdzie każdy n-gram jest zapisany w osobnej linii, wraz z ilością jego wystąpień. 
+- Funkcja zamienia wektor zawierający n-gramy na wartość typu string. Następnie łączy wszystkie wartości w jednolity
+  tekst, gdzie każdy n-gram jest zapisany w osobnej linii, wraz z ilością jego wystąpień.
+
 #### Wyniki
 
 Działanie programu do generowania n-gramów. W tym przypadku w argumencie wpisano liczbę 2.
@@ -506,10 +546,12 @@ pub fn ngram_reader(args: Args) {
 
 - Funkcja przyjmuje w argumencie ścieżkę do pliku z zapisanym histogramem n-gramów oraz ich rozmiar.
 - Funkcja nic nie zwraca.
-- Funkcja w pierwszej kolejności wczytuje informacje o n-gramach: ścieżkę do pliku oraz wielkość n-gramu. Następnie otwiera ngram i przy pomocy funkcji ```ngram_parser``` oblicza prawdopodobieństwo wystąpienia n-gramu, a następnie wypisuje go.
-
+- Funkcja w pierwszej kolejności wczytuje informacje o n-gramach: ścieżkę do pliku oraz wielkość n-gramu. Następnie
+  otwiera ngram i przy pomocy funkcji ```ngram_parser``` oblicza prawdopodobieństwo wystąpienia n-gramu, a następnie
+  wypisuje go.
 
 Kod źródłowy funkcji ```ngram_parser```.
+
 ```Rust
 pub fn ngram_parser(ngram: File, n: u8) -> Vec<(String, f64)> {
     let mut map: Vec<(String, u64)> = Vec::new();
@@ -542,12 +584,13 @@ pub fn ngram_parser(ngram: File, n: u8) -> Vec<(String, f64)> {
         .collect()
 }
 ```
+
 - Funkcja przyjmuje otwarty plik z n-gramami.
 - Funcka zwraca wektor pary n-gram i prawdopodobieństwo jego wystąpienia.
-- Funkcja iteruje po wektorze zliczając ilość wszystkich n-gramów, a następnie oblicza prawdopodobieństwo dla każdego n-gramu występującego w tekście.
+- Funkcja iteruje po wektorze zliczając ilość wszystkich n-gramów, a następnie oblicza prawdopodobieństwo dla każdego
+  n-gramu występującego w tekście.
+
 #### Wyniki
-
-
 
 ```sh
 
@@ -601,16 +644,24 @@ pub fn x2test(args: Args) {
     println!("{sum:.20}")
 }
 ```
-- Funkcja przyjmuje za argumenty strukturę, wykorzystuje z niej ścieżkę do pliku tekstu wejściowego, ścieżkę do pliku zawierającego n-gramy oraz jego rozmiar.
+
+- Funkcja przyjmuje za argumenty strukturę, wykorzystuje z niej ścieżkę do pliku tekstu wejściowego, ścieżkę do pliku
+  zawierającego n-gramy oraz jego rozmiar.
 - Funkcja nic nie zwraca.
-- Funkcja przygotowuje pliki do analizy, otwiera je i usuwa zbędne znaki (np. spacje) i skleja całość w jeden ciąg znaków. Następnie tworzy z tego pliku histogram n-gramów, który porównuje z histogramem podanym w argumencie funkcji. Następnie oblicza wartość testu x^2 dla podanych plików. 
+- Funkcja przygotowuje pliki do analizy, otwiera je i usuwa zbędne znaki (np. spacje) i skleja całość w jeden ciąg
+  znaków. Następnie tworzy z tego pliku histogram n-gramów, który porównuje z histogramem podanym w argumencie funkcji.
+  Następnie oblicza wartość testu x^2 dla podanych plików.
+
 ```shell
 
 ./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r2 2-grams.txt
 0.00000000000000000000
 
 ```
-Program poprawnie porównuje n-gram z plikiem tekstu jawnego. Wynik 0 oznacza, że pliki są takie same, co jest prawdą, ponieważ plik ```2-grams.txt``` został wygenerowany na podstawie pliku ```alice_wonderlands```. Poniżej przedstawiono przykład dla n-gramu, który nie jest powiązany z plikiem źródłowym.
+
+Program poprawnie porównuje n-gram z plikiem tekstu jawnego. Wynik 0 oznacza, że pliki są takie same, co jest prawdą,
+ponieważ plik ```2-grams.txt``` został wygenerowany na podstawie pliku ```alice_wonderlands```. Poniżej przedstawiono
+przykład dla n-gramu, który nie jest powiązany z plikiem źródłowym.
 
 ```shell
 
@@ -620,6 +671,7 @@ Program poprawnie porównuje n-gram z plikiem tekstu jawnego. Wynik 0 oznacza, �
 ```
 
 ### Zadanie 4
+
 - Dokonaj obserwacji wyniku testu χ2 dla tekstu jawnego i zaszyfrowanego o różnych długościach.
 - Wiadomo, iż wynik testu może być znacząco zaburzony w przypadku gdy brane są pod uwagę symbole (n-gramy),
   które rzadko występują w tekście, np w przypadku mono-gramów języka angielskiego są to litery: J, K, Q, X oraz
@@ -657,6 +709,7 @@ Wyniki
 1210.92697753112520331342
 
 ```
+
 ```sh
 
 ./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r3 english_trigrams.txt 
@@ -671,6 +724,7 @@ Wyniki
 ./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r3 english_trigrams.txt 
 3102.87288484137070554425
 ```
+
 ```sh
 
 ./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r4 english_quadgrams.txt 
@@ -687,4 +741,6 @@ Wyniki
 
 
 ```
-Wyniki funkcji x^2 dla tekstu jawnego oraz odpowiadającego mu tekstu zaszyfrowanego są takie same, skrócenie n-gramów zmniejsza wynik.
+
+Wyniki funkcji x^2 dla tekstu jawnego oraz odpowiadającego mu tekstu zaszyfrowanego są takie same, skrócenie n-gramów
+zmniejsza wynik.

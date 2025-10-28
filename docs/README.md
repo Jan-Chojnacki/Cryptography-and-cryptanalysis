@@ -1,11 +1,15 @@
 # Kryptografia i kryptoanaliza
+
 ## Laboratorium X
+
 ### Grupa Y
+
 ### Autorzy: Imię-1 Nazwisko-1, Imię-2 Nazwisko-2
 
 ### Zadanie 1
 
 Napisz program (w języku: C++, RUST, Python) implementujący algorytm szyfru przesuwnego (szyfr Cezara).
+
 1. Tekst jawny powinien być importowany do programu z pliku tekstowego, którego nazwa określona powinna być
    po zdefiniowanym argumencie / fladze: -i.
 2. Wynik pracy programu powinien być eksportowany do pliku tekstowego, którego nazwa określona powinna być
@@ -25,6 +29,7 @@ fn main(){
 ```
 
 Kod źródłowy powinien być podzielony na części (definicje i funkcje). Każdy fragment programu powinien być opisany:
+
 - co jest wejściem funkcji
 - co jest wyjściem funkcji
 - co implementuje dana funkcja
@@ -53,6 +58,7 @@ fn main(){
 ```
 
 Kod źródłowy powinien być podzielony na części (definicje i funkcje). Każdy fragment programu powinien być opisany:
+
 - co jest wejściem funkcji
 - co jest wyjściem funkcji
 - co implementuje dana funkcja
@@ -78,6 +84,7 @@ fn main(){
 ```
 
 Kod źródłowy powinien być podzielony na części (definicje i funkcje). Każdy fragment programu powinien być opisany:
+
 - co jest wejściem funkcji
 - co jest wyjściem funkcji
 - co implementuje dana funkcja
@@ -105,6 +112,7 @@ fn main(){
 ```
 
 Kod źródłowy powinien być podzielony na części (definicje i funkcje). Każdy fragment programu powinien być opisany:
+
 - co jest wejściem funkcji
 - co jest wyjściem funkcji
 - co implementuje dana funkcja
