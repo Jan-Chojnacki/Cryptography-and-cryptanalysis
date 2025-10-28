@@ -40,13 +40,13 @@ pub enum Commands {
     },
     /// Porównanie podobieństwa rozkładu tekstu wejściowego z referencyjnym.
     Similarity {
-        /// Rozmiar n-gramów wykorzystywanych w analizie statystycznej.
+        /// Rozmiar n-gramów wykorzystywany podczas analizy statystycznej.
         #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
         r: u8,
         /// Ścieżka do pliku z referencyjnymi częstotliwościami n-gramów.
         #[arg(value_name = "FILE")]
         file: PathBuf,
-        /// Ścieżka do pliku zawierającego analizowany tekst.
+        /// Ścieżka do pliku z tekstem poddawanym analizie n-gramowej.
         #[arg(short, long)]
         input: PathBuf,
     },
@@ -69,7 +69,7 @@ pub enum NgramCommand {
     },
     /// Wyświetla referencyjny zbiór n-gramów z pliku.
     Read {
-        /// Rozmiar n-gramów odpowiadający plikowi referencyjnemu.
+        /// Rozmiar n-gramów wykorzystywany podczas analizy statystycznej.
         #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
         r: u8,
         /// Ścieżka do pliku z zapisanymi częstotliwościami n-gramów.
@@ -113,10 +113,10 @@ pub enum AlgorithmCommand {
         /// Plik wyjściowy na wynik szyfrowania bądź deszyfrowania.
         #[arg(short, long)]
         output: PathBuf,
-        /// Współczynnik multiplikatywny `a`, względnie pierwszy z 26.
+        /// Współczynnik multiplikatywny klucza afinicznego wymagający istnienia odwrotności modulo 26.
         #[arg(short, long)]
         a: u32,
-        /// Współczynnik addytywny `b` w zakresie alfabetu.
+        /// Współczynnik addytywny klucza afinicznego, redukowany do zakresu alfabetu (mod 26).
         #[arg(short, long)]
         b: u32,
     },
@@ -153,16 +153,16 @@ pub enum AttackAlgorithmCommand {
 /// Wspólne parametry uruchomienia ataków brute force.
 #[derive(clap::Args, Debug)]
 pub struct AttackArgs {
-    /// Plik z tekstem zaszyfrowanym będącym celem ataku.
+    /// Ścieżka do pliku z szyfrogramem przeznaczonym do analizy brute force.
     #[arg(short, long)]
     pub input: PathBuf,
-    /// Plik, do którego zostanie zapisane najlepsze odgadnięte odszyfrowanie.
+    /// Ścieżka do pliku przeznaczonego na najlepszy znaleziony tekst jawny.
     #[arg(short, long)]
     pub output: PathBuf,
-    /// Rozmiar n-gramów wykorzystywanych w teście statystycznym.
+    /// Rozmiar n-gramów wykorzystywany podczas analizy statystycznej.
     #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
     pub r: u8,
-    /// Plik z referencyjnymi częstotliwościami n-gramów wykorzystywanymi w ocenie.
+    /// Ścieżka do pliku z referencyjnymi częstotliwościami n-gramów.
     #[arg(value_name = "FILE")]
     pub file: PathBuf,
 }

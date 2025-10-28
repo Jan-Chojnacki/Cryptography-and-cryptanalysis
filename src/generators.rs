@@ -3,6 +3,14 @@
 use std::collections::HashMap;
 
 /// Tworzy wektor wszystkich n-gramów o zadanym rozmiarze z tekstu wejściowego.
+///
+/// # Arguments
+/// * `input` - Tekst źródłowy, z którego mają zostać wyodrębnione n-gramy.
+/// * `ngram_size` - Liczba określająca długość pojedynczego n-gramu.
+///
+/// # Zwracana wartość
+/// Zwraca wektor łańcuchów reprezentujących kolejne n-gramy w kolejności
+/// występowania w tekście źródłowym.
 pub fn ngram_generator(input: &str, ngram_size: u8) -> Vec<String> {
     input
         .as_bytes()
@@ -12,6 +20,12 @@ pub fn ngram_generator(input: &str, ngram_size: u8) -> Vec<String> {
 }
 
 /// Buduje histogram częstości występowania n-gramów.
+///
+/// # Arguments
+/// * `ngram` - Wektor n-gramów, najczęściej otrzymany z `ngram_generator`.
+///
+/// # Zwracana wartość
+/// Zwraca mapę zliczającą liczbę wystąpień każdego n-gramu w przekazanym wektorze.
 pub fn histogram_generator(ngram: Vec<String>) -> HashMap<String, u64> {
     ngram
         .iter()

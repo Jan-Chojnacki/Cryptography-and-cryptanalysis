@@ -12,6 +12,12 @@ use crate::file_parsers::input_parser;
 use std::path::PathBuf;
 
 /// Wczytuje dane wejściowe, generuje klucz szyfrujący `Ax + B mod 26` i zapisuje wynik.
+///
+/// # Arguments
+/// * `input` - Ścieżka do pliku z tekstem jawnym przeznaczonym do zaszyfrowania.
+/// * `output` - Ścieżka do pliku, w którym zapisany zostanie szyfrogram.
+/// * `a` - Współczynnik multiplikatywny klucza afinicznego wymagający istnienia odwrotności modulo 26.
+/// * `b` - Współczynnik addytywny klucza afinicznego, redukowany do zakresu alfabetu (mod 26).
 pub fn handle_encrypt(input: PathBuf, output: PathBuf, a: u32, b: u32) {
     let input = open_input(input).expect("Failed to open input file");
     let output = open_output(output).expect("Failed to open output file");
@@ -25,6 +31,12 @@ pub fn handle_encrypt(input: PathBuf, output: PathBuf, a: u32, b: u32) {
 }
 
 /// Wczytuje dane wejściowe, wyznacza klucz deszyfrujący i zapisuje odszyfrowany tekst.
+///
+/// # Arguments
+/// * `input` - Ścieżka do pliku zawierającego szyfrogram poddawany odszyfrowaniu.
+/// * `output` - Ścieżka do pliku przeznaczonego na zapis wyniku deszyfrowania.
+/// * `a` - Współczynnik multiplikatywny klucza afinicznego wymagający istnienia odwrotności modulo 26.
+/// * `b` - Współczynnik addytywny klucza afinicznego, redukowany do zakresu alfabetu (mod 26).
 pub fn handle_decrypt(input: PathBuf, output: PathBuf, a: u32, b: u32) {
     let input = open_input(input).expect("Failed to open input file");
     let output = open_output(output).expect("Failed to open output file");

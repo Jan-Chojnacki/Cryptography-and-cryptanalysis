@@ -3,8 +3,13 @@ use std::collections::HashMap;
 
 /// Buduje mapowanie znaków szyfrujące dla parametrów `a` i `b` szyfru afinicznego.
 ///
-/// Funkcja weryfikuje, że `a` jest względnie pierwsze z 26 i zwraca gotową tablicę
-/// podstawień dla wielkich liter alfabetu łacińskiego.
+/// # Arguments
+/// * `a` - Współczynnik multiplikatywny klucza afinicznego wymagający istnienia odwrotności modulo 26.
+/// * `b` - Współczynnik addytywny klucza afinicznego, redukowany do zakresu alfabetu (mod 26).
+///
+/// # Zwracana wartość
+/// Zwraca mapę `HashMap<char, char>` odwzorowującą każdą literę tekstu jawnego na
+/// odpowiadającą jej literę szyfrogramu zgodnie z równaniem `Ax + B mod 26`.
 pub fn generate_affine_encrypt_key(a: u32, b: u32) -> HashMap<char, char> {
     const M: u32 = 26;
 

@@ -8,6 +8,11 @@ use statrs::distribution::{ChiSquared, ContinuousCDF};
 use std::path::PathBuf;
 
 /// Generuje histogram n-gramów z tekstu wejściowego i opcjonalnie zapisuje go do pliku.
+///
+/// # Arguments
+/// * `input` - Ścieżka do pliku z tekstem poddawanym analizie n-gramowej.
+/// * `file` - Opcjonalna ścieżka do pliku wynikowego; `None` oznacza wyłącznie wypisanie w konsoli.
+/// * `g` - Rozmiar n-gramów wykorzystywanych podczas generowania statystyk.
 pub fn ngram_generator(input: PathBuf, file: Option<PathBuf>, g: u8) {
     let input = open_input(input).expect("Failed to open input file");
 
@@ -27,6 +32,10 @@ pub fn ngram_generator(input: PathBuf, file: Option<PathBuf>, g: u8) {
 }
 
 /// Wczytuje i wypisuje referencyjne statystyki n-gramów.
+///
+/// # Arguments
+/// * `file` - Ścieżka do pliku z zapisanymi n-gramami w formacie tekstowym.
+/// * `r` - Rozmiar n-gramów wykorzystywany podczas analizy statystycznej.
 pub fn ngram_reader(file: PathBuf, r: u8) {
     let ngram = open_ngram(file).expect("Failed to open ngram file");
 
@@ -36,6 +45,11 @@ pub fn ngram_reader(file: PathBuf, r: u8) {
 }
 
 /// Oblicza statystykę chi-kwadrat dla porównania tekstu wejściowego z referencją n-gramów.
+///
+/// # Arguments
+/// * `input` - Ścieżka do pliku z tekstem poddawanym analizie n-gramowej.
+/// * `file` - Ścieżka do pliku zawierającego referencyjne częstotliwości n-gramów.
+/// * `r` - Rozmiar n-gramów wykorzystywany podczas analizy statystycznej.
 pub fn x2test(input: PathBuf, file: PathBuf, r: u8) {
     let input = open_input(input).expect("Failed to open input file");
 

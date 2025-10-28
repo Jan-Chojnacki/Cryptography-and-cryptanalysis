@@ -19,9 +19,17 @@ use clap::Parser;
 
 /// Punkt wejścia programu odpowiedzialny za sparsowanie argumentów i delegowanie
 /// wykonania do odpowiednich modułów implementujących algorytmy, operacje i ataki.
+///
+/// # Działanie
+/// * Korzysta z `clap` do odczytania poleceń przekazanych wierszem poleceń.
+/// * Na podstawie otrzymanego podpolecenia wywołuje funkcję obsługującą dany tryb
+///   pracy (szyfrowanie, deszyfrowanie, analizy n-gramowe bądź ataki).
+/// * Każdy wariant polecenia przekazuje dalej odpowiednie argumenty, dzięki czemu
+///   logika biznesowa pozostaje odseparowana od warstwy CLI.
 fn main() {
     let args = Args::parse();
 
+    // Dopasowanie wariantu polecenia przekierowujące wykonanie do odpowiedniego modułu.
     match args.commands {
         Commands::Encrypt { algorithm_command } => match algorithm_command {
             AlgorithmCommand::Substitution { input, output, key } => {

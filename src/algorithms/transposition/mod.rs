@@ -9,6 +9,11 @@ use crate::file_parsers::input_parser;
 use std::path::PathBuf;
 
 /// Wczytuje dane, generuje klucz przestawieniowy o zadanym przesunięciu i zapisuje wynik.
+///
+/// # Arguments
+/// * `input` - Ścieżka do pliku z tekstem jawnym przeznaczonym do zaszyfrowania.
+/// * `output` - Ścieżka do pliku, do którego trafi szyfrogram po przestawieniu liter.
+/// * `key` - Wartość przesunięcia cyklicznego alfabetu w zakresie 1-25.
 pub fn handle_encrypt(input: PathBuf, output: PathBuf, key: u8) {
     let input = open_input(input).expect("Failed to open input file");
     let output = open_output(output).expect("Failed to open output file");
@@ -23,6 +28,11 @@ pub fn handle_encrypt(input: PathBuf, output: PathBuf, key: u8) {
 }
 
 /// Wczytuje dane, odwraca przesunięcie klucza i zapisuje odszyfrowany tekst.
+///
+/// # Arguments
+/// * `input` - Ścieżka do pliku z szyfrogramem generowanym szyfrem przestawieniowym.
+/// * `output` - Ścieżka do pliku, w którym zapisany zostanie tekst jawny.
+/// * `key` - Wartość przesunięcia cyklicznego alfabetu w zakresie 1-25.
 pub fn handle_decrypt(input: PathBuf, output: PathBuf, key: u8) {
     let input = open_input(input).expect("Failed to open input file");
     let output = open_output(output).expect("Failed to open output file");

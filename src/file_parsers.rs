@@ -6,6 +6,9 @@ use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 
 /// Czyta plik tekstowy, filtruje znaki do alfabetu łacińskiego i zwraca je w postaci wielkich liter.
+///
+/// # Arguments
+/// * `input` - Uchwyt do pliku zawierającego tekst, z którego mają zostać wyodrębnione litery.
 pub fn input_parser(input: File) -> String {
     let reader = BufReader::new(input);
     let mut buf: Vec<String> = Vec::new();
@@ -22,6 +25,10 @@ pub fn input_parser(input: File) -> String {
 }
 
 /// Buduje mapowanie znaków na podstawie pliku z kluczem, uwzględniając kierunek konwersji.
+///
+/// # Arguments
+/// * `key` - Uchwyt do pliku zawierającego pary znaków opisujące zamianę.
+/// * `decryption` - Flaga określająca kierunek mapowania: `false` dla szyfrowania, `true` dla deszyfrowania.
 pub fn key_parser(key: File, decryption: bool) -> HashMap<char, char> {
     let mut map: HashMap<char, char> = HashMap::new();
     let reader = BufReader::new(key);
@@ -58,6 +65,10 @@ pub fn key_parser(key: File, decryption: bool) -> HashMap<char, char> {
 }
 
 /// Parsuje plik z częstotliwościami n-gramów i normalizuje wartości do sumy 1.
+///
+/// # Arguments
+/// * `ngram` - Uchwyt do pliku z częstościami n-gramów w formacie `NGRAM WARTOŚĆ`.
+/// * `n` - Rozmiar oczekiwanych n-gramów, wykorzystywany do walidacji długości klucza.
 pub fn ngram_parser(ngram: File, n: u8) -> HashMap<String, f64> {
     let mut map: Vec<(String, u64)> = Vec::new();
     let reader = BufReader::new(ngram);
