@@ -3,11 +3,9 @@
 mod algorithms;
 mod args;
 mod attack;
-mod converters;
 mod file_handling;
-mod file_parsers;
-mod generators;
 mod operations;
+mod ngram;
 
 use crate::algorithms::*;
 use crate::args::{
@@ -65,10 +63,10 @@ fn main() {
         },
         Commands::Ngram { ngram_command } => match ngram_command {
             NgramCommand::Generate { g, input, file } => {
-                operations::ngram_generator(input, file, g);
+                operations::handle_ngram_generate(input, file, g);
             }
             NgramCommand::Read { r, file } => {
-                operations::ngram_reader(file, r);
+                operations::handle_ngram_read(file, r);
             }
         },
         Commands::Attack { attack_command } => match attack_command {
@@ -94,7 +92,7 @@ fn main() {
             },
         },
         Commands::Similarity { r, input, file } => {
-            operations::x2test(input, file, r);
+            operations::handle_x2test(input, file, r);
         }
     }
 }

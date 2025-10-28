@@ -1,8 +1,11 @@
 //! Wysokopoziomowe funkcje obsługujące szyfr podstawieniowy bazujący na mapowaniu klucza.
 
+mod key_parser;
+
+use crate::algorithms::input_parser::input_parser;
+use crate::algorithms::substitution::key_parser::key_parser;
 use crate::algorithms::util::substitute::substitute;
 use crate::file_handling::{open_input, open_key, open_output, save_to_file};
-use crate::file_parsers::{input_parser, key_parser};
 use std::path::PathBuf;
 
 /// Wczytuje tekst oraz klucz podstawieniowy i zapisuje zaszyfrowany rezultat.

@@ -6,9 +6,9 @@ pub mod generate_affine_encrypt_key;
 
 use crate::algorithms::affine::generate_affine_decrypt_key::generate_affine_decrypt_key;
 use crate::algorithms::affine::generate_affine_encrypt_key::generate_affine_encrypt_key;
+use crate::algorithms::input_parser::input_parser;
 use crate::algorithms::util::substitute::substitute;
 use crate::file_handling::{open_input, open_output, save_to_file};
-use crate::file_parsers::input_parser;
 use std::path::PathBuf;
 
 /// Wczytuje dane wejściowe, generuje klucz szyfrujący `Ax + B mod 26` i zapisuje wynik.

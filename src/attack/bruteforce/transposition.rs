@@ -1,9 +1,11 @@
+use crate::algorithms::input_parser::input_parser;
 use crate::algorithms::transposition::generate_transposition_key::generate_transposition_key;
 use crate::algorithms::util::substitute::substitute;
 use crate::attack::x2test::x2test;
 use crate::file_handling::{open_input, open_ngram, open_output, save_to_file};
-use crate::file_parsers::{input_parser, ngram_parser};
-use crate::generators::{histogram_generator, ngram_generator};
+use crate::ngram::histogram_generator::histogram_generator;
+use crate::ngram::ngram_generator::ngram_generator;
+use crate::ngram::ngram_parser::ngram_parser;
 use rayon::prelude::*;
 use statrs::distribution::{ChiSquared, ContinuousCDF};
 use std::collections::HashMap;
