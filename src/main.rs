@@ -15,8 +15,7 @@ use crate::args::{
 use crate::attack::*;
 use clap::Parser;
 
-/// Entrypoint that parses CLI arguments, validates them and dispatches the
-/// selected operating mode.
+
 fn main() {
     let args = Args::parse();
 

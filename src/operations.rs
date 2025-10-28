@@ -1,19 +1,18 @@
-use std::path::PathBuf;
-use statrs::distribution::{ChiSquared, ContinuousCDF};
 use crate::converters::ngram_to_string;
 use crate::file_handling::{open_input, open_ngram, open_output, save_to_file};
 use crate::file_parsers::{input_parser, ngram_parser};
 use crate::generators::histogram_generator;
+use statrs::distribution::{ChiSquared, ContinuousCDF};
+use std::path::PathBuf;
 
-/// Generates an n-gram histogram from an input file and stores it in both stdout and a file.
+
 pub fn ngram_generator(input: PathBuf, file: Option<PathBuf>, g: u8) {
-    // Read the plaintext input.
     let input = open_input(input).expect("Failed to open input file");
 
-    // Normalise the plaintext prior to n-gram extraction.
+
     let input = input_parser(input);
 
-    // Build the n-gram list, convert it into a histogram and serialise the result.
+
     let ngram = crate::generators::ngram_generator(&input, g);
     let histogram = histogram_generator(ngram);
     let buf = ngram_to_string(histogram);
@@ -22,14 +21,13 @@ pub fn ngram_generator(input: PathBuf, file: Option<PathBuf>, g: u8) {
 
     if let Some(file) = file {
         let output = open_output(file).expect("Failed to open output file");
-        // Write the histogram to disk for later use.
+
         save_to_file(&buf, output);
     }
 }
 
-/// Prints a previously generated n-gram histogram to stdout.
+
 pub fn ngram_reader(file: PathBuf, r: u8) {
-    // Load and parse the histogram file to recover its probability distribution.
     let ngram = open_ngram(file).expect("Failed to open ngram file");
 
     let ngram = ngram_parser(ngram, r);
@@ -37,25 +35,24 @@ pub fn ngram_reader(file: PathBuf, r: u8) {
     println!("{}", ngram_to_string(ngram));
 }
 
-/// Performs the chi-squared goodness-of-fit test between two n-gram distributions.
+
 pub fn x2test(input: PathBuf, file: PathBuf, r: u8) {
-    // Parse the ciphertext and compute its histogram for the requested n-gram length.
     let input = open_input(input).expect("Failed to open input file");
 
     let input = input_parser(input);
     let ngram = crate::generators::ngram_generator(&input, r);
     let ngram = histogram_generator(ngram);
 
-    // Load the reference histogram used as the expected distribution.
+
     let ngram_ref = open_ngram(file).expect("Failed to open ngram file");
     let ngram_ref = ngram_parser(ngram_ref, r);
 
     let mut x2: f64 = 0.0;
 
-    // Total number of observed n-grams in the analysed text.
+
     let n: u64 = ngram.values().sum();
 
-    // Apply the chi-squared formula across each n-gram observation.
+
     for (k, v) in ngram {
         if let Some(rv) = ngram_ref.get(&k) {
             let e = rv * n as f64;
@@ -77,6 +74,5 @@ pub fn x2test(input: PathBuf, file: PathBuf, r: u8) {
     );
 }
 
-// pub fn attack() {
-//
-// }
+
+

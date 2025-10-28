@@ -1,7 +1,7 @@
 use clap::Subcommand;
 use std::path::PathBuf;
 
-/// Command line arguments accepted by the application.
+
 #[derive(clap::Parser, Debug)]
 #[command(version, about, long_about = None)]
 pub struct Args {

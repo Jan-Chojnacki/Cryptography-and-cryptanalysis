@@ -1,3 +1,5 @@
+use crate::algorithms::transposition::generate_transposition_key::generate_transposition_key;
+use crate::algorithms::util::substitute::substitute;
 use crate::attack::x2test::x2test;
 use crate::file_handling::{open_input, open_ngram, open_output, save_to_file};
 use crate::file_parsers::{input_parser, ngram_parser};
@@ -7,8 +9,6 @@ use statrs::distribution::{ChiSquared, ContinuousCDF};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Mutex;
-use crate::algorithms::transposition::generate_transposition_key::generate_transposition_key;
-use crate::algorithms::util::substitute::substitute;
 
 pub fn handle_attack(input: PathBuf, output: PathBuf, ngram_ref: PathBuf, r: u8) {
     let input = open_input(input).expect("Failed to open input file");

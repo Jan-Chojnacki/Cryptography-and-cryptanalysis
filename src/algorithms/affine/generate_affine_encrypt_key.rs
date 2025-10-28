@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use gcd::euclid_u32;
+use std::collections::HashMap;
 
 pub fn generate_affine_encrypt_key(a: u32, b: u32) -> HashMap<char, char> {
     const M: u32 = 26;

@@ -1,14 +1,14 @@
-use std::collections::HashMap;
-use std::path::PathBuf;
-use std::sync::Mutex;
-use rayon::prelude::*;
-use statrs::distribution::{ChiSquared, ContinuousCDF};
 use crate::algorithms::affine::generate_affine_decrypt_key::generate_affine_decrypt_key;
+use crate::algorithms::util::substitute::substitute;
 use crate::attack::x2test::x2test;
 use crate::file_handling::{open_input, open_ngram, open_output, save_to_file};
 use crate::file_parsers::{input_parser, ngram_parser};
 use crate::generators::{histogram_generator, ngram_generator};
-use crate::algorithms::util::substitute::substitute;
+use rayon::prelude::*;
+use statrs::distribution::{ChiSquared, ContinuousCDF};
+use std::collections::HashMap;
+use std::path::PathBuf;
+use std::sync::Mutex;
 
 pub fn handle_attack(input: PathBuf, output: PathBuf, ngram_ref: PathBuf, r: u8) {
     let input = open_input(input).expect("Failed to open input file");

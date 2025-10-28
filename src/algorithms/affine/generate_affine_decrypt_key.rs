@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use bare_metal_modulo::{MNum, ModNum};
+use std::collections::HashMap;
 
 pub fn generate_affine_decrypt_key(a: u32, b: u32) -> HashMap<char, char> {
     const M: i32 = 26;
