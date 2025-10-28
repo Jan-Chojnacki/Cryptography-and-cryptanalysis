@@ -95,10 +95,6 @@ pub enum AttackCommand {
 
 #[derive(Subcommand, Debug)]
 pub enum AttackAlgorithmCommand {
-    Substitution {
-        #[clap(flatten)]
-        args: AttackArgs,
-    },
     Transposition {
         #[clap(flatten)]
         args: AttackArgs,

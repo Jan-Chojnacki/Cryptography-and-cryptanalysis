@@ -63,15 +63,6 @@ fn main() {
         },
         Commands::Attack { attack_command } => match attack_command {
             AttackCommand::BruteForce { algorithm } => match algorithm {
-                AttackAlgorithmCommand::Substitution { args } => {
-                    let AttackArgs {
-                        input,
-                        output,
-                        file,
-                        r,
-                    } = args;
-                    
-                }
                 AttackAlgorithmCommand::Transposition { args } => {
                     let AttackArgs {
                         input,
