@@ -28,11 +28,11 @@ pub enum Commands {
         attack_command: AttackCommand,
     },
     Similarity {
-        #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4))]
+        #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
         r: u8,
         #[arg(value_name = "FILE")]
         file: PathBuf,
-        #[arg(short, long, value_name = "FILE")]
+        #[arg(short, long)]
         input: PathBuf,
     },
 }
@@ -40,15 +40,15 @@ pub enum Commands {
 #[derive(Subcommand, Debug)]
 pub enum NgramCommand {
     Generate {
-        #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4))]
+        #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
         g: u8,
-        #[arg(short, long, value_name = "FILE")]
+        #[arg(short, long)]
         input: PathBuf,
         #[arg(value_name = "FILE")]
         file: Option<PathBuf>,
     },
     Read {
-        #[arg(short, long, value_name = "NUMBER", value_parser = clap::value_parser!(u8).range(1..=4))]
+        #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
         r: u8,
         #[arg(value_name = "FILE")]
         file: PathBuf,
@@ -58,25 +58,25 @@ pub enum NgramCommand {
 #[derive(Subcommand, Debug)]
 pub enum AlgorithmCommand {
     Substitution {
-        #[arg(short, long, value_name = "FILE")]
+        #[arg(short, long)]
         input: PathBuf,
-        #[arg(short, long, value_name = "FILE")]
+        #[arg(short, long)]
         output: PathBuf,
-        #[arg(short, long, value_name = "FILE")]
+        #[arg(short, long)]
         key: PathBuf,
     },
     Transposition {
-        #[arg(short, long, value_name = "FILE")]
+        #[arg(short, long)]
         input: PathBuf,
-        #[arg(short, long, value_name = "FILE")]
+        #[arg(short, long)]
         output: PathBuf,
         #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=25))]
         key: u8,
     },
     Affine {
-        #[arg(short, long, value_name = "FILE")]
+        #[arg(short, long)]
         input: PathBuf,
-        #[arg(short, long, value_name = "FILE")]
+        #[arg(short, long)]
         output: PathBuf,
         #[arg(short, long)]
         a: u32,
@@ -86,7 +86,6 @@ pub enum AlgorithmCommand {
 }
 
 #[derive(Subcommand, Debug)]
-#[command(infer_subcommands = true)]
 pub enum AttackCommand {
     BruteForce {
         #[command(subcommand)]
@@ -97,33 +96,27 @@ pub enum AttackCommand {
 #[derive(Subcommand, Debug)]
 pub enum AttackAlgorithmCommand {
     Substitution {
-        #[arg(short, long, value_name = "FILE")]
-        input: PathBuf,
-        #[arg(short, long, value_name = "FILE")]
-        output: PathBuf,
-        #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
-        r: u8,
-        #[arg(value_name = "FILE")]
-        file: PathBuf,
+        #[clap(flatten)]
+        args: AttackArgs,
     },
     Transposition {
-        #[arg(short, long, value_name = "FILE")]
-        input: PathBuf,
-        #[arg(short, long, value_name = "FILE")]
-        output: PathBuf,
-        #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
-        r: u8,
-        #[arg(value_name = "FILE")]
-        file: PathBuf,
+        #[clap(flatten)]
+        args: AttackArgs,
     },
     Affine {
-        #[arg(short, long, value_name = "FILE")]
-        input: PathBuf,
-        #[arg(short, long, value_name = "FILE")]
-        output: PathBuf,
-        #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
-        r: u8,
-        #[arg(value_name = "FILE")]
-        file: PathBuf,
+        #[clap(flatten)]
+        args: AttackArgs,
     },
+}
+
+#[derive(clap::Args, Debug)]
+pub struct AttackArgs {
+    #[arg(short, long)]
+    pub input: PathBuf,
+    #[arg(short, long)]
+    pub output: PathBuf,
+    #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
+    pub r: u8,
+    #[arg(value_name = "FILE")]
+    pub file: PathBuf,
 }
