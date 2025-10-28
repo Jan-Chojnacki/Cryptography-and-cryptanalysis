@@ -3,11 +3,12 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 use rayon::prelude::*;
 use statrs::distribution::{ChiSquared, ContinuousCDF};
-use crate::algorithms::affine;
+use crate::algorithms::affine::generate_affine_decrypt_key::generate_affine_decrypt_key;
 use crate::attack::x2test::x2test;
 use crate::file_handling::{open_input, open_ngram, open_output, save_to_file};
 use crate::file_parsers::{input_parser, ngram_parser};
-use crate::generators::{generate_affine_decrypt_key, histogram_generator, ngram_generator};
+use crate::generators::{histogram_generator, ngram_generator};
+use crate::algorithms::util::substitute::substitute;
 
 pub fn handle_attack(input: PathBuf, output: PathBuf, ngram_ref: PathBuf, r: u8) {
     let input = open_input(input).expect("Failed to open input file");
@@ -46,7 +47,7 @@ fn attack(input: String, ngram_ref: HashMap<String, f64>, df: f64, p: f64, r: u8
         .into_par_iter()
         .filter_map(|(a, b)| {
             let key = generate_affine_decrypt_key(a, b);
-            let decrypted = affine::decrypt(&input, key);
+            let decrypted = substitute(&input, key);
 
             let ngram = ngram_generator(&decrypted, r);
             let ngram = histogram_generator(ngram);
@@ -73,5 +74,5 @@ fn attack(input: String, ngram_ref: HashMap<String, f64>, df: f64, p: f64, r: u8
     println!("best_key=(a={}, b={}), best_x2={}", best_a, best_b, best_x2);
 
     let key = generate_affine_decrypt_key(*best_a, *best_b);
-    affine::decrypt(&input, key)
+    substitute(&input, key)
 }

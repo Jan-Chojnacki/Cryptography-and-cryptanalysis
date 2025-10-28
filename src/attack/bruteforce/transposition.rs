@@ -1,13 +1,14 @@
-use crate::algorithms::transposition;
 use crate::attack::x2test::x2test;
 use crate::file_handling::{open_input, open_ngram, open_output, save_to_file};
 use crate::file_parsers::{input_parser, ngram_parser};
-use crate::generators::{generate_transposition_key, histogram_generator, ngram_generator};
+use crate::generators::{histogram_generator, ngram_generator};
 use rayon::prelude::*;
 use statrs::distribution::{ChiSquared, ContinuousCDF};
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Mutex;
+use crate::algorithms::transposition::generate_transposition_key::generate_transposition_key;
+use crate::algorithms::util::substitute::substitute;
 
 pub fn handle_attack(input: PathBuf, output: PathBuf, ngram_ref: PathBuf, r: u8) {
     let input = open_input(input).expect("Failed to open input file");
@@ -38,7 +39,7 @@ fn attack(input: String, ngram_ref: HashMap<String, f64>, df: f64, p: f64, r: u8
         .into_par_iter()
         .filter_map(|i| {
             let key = generate_transposition_key(-(i as i16));
-            let decrypted = transposition::decrypt(&input, key);
+            let decrypted = substitute(&input, key);
 
             let ngram = ngram_generator(&decrypted, r);
             let ngram = histogram_generator(ngram);
@@ -64,5 +65,5 @@ fn attack(input: String, ngram_ref: HashMap<String, f64>, df: f64, p: f64, r: u8
     let (best_key, best_x2) = results.first().unwrap();
     println!("best_key={}, best_x2={}", best_key, best_x2);
     let key = generate_transposition_key(-(*best_key as i16));
-    transposition::decrypt(&input, key)
+    substitute(&input, key)
 }
