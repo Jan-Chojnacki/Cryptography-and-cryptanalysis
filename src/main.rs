@@ -63,7 +63,15 @@ fn main() {
         },
         Commands::Attack { attack_command } => match attack_command {
             AttackCommand::BruteForce { algorithm } => match algorithm {
-                AttackAlgorithmCommand::Substitution { .. } => {}
+                AttackAlgorithmCommand::Substitution { args } => {
+                    let AttackArgs {
+                        input,
+                        output,
+                        file,
+                        r,
+                    } = args;
+                    
+                }
                 AttackAlgorithmCommand::Transposition { args } => {
                     let AttackArgs {
                         input,
@@ -73,7 +81,15 @@ fn main() {
                     } = args;
                     bruteforce::transposition::handle_attack(input, output, file, r);
                 }
-                AttackAlgorithmCommand::Affine { .. } => {}
+                AttackAlgorithmCommand::Affine { args } => {
+                    let AttackArgs {
+                        input,
+                        output,
+                        file,
+                        r,
+                    } = args;
+                    bruteforce::affine::handle_attack(input, output, file, r);
+                }
             },
         },
         Commands::Similarity { r, input, file } => {
