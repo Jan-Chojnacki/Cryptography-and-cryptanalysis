@@ -11,6 +11,12 @@ use std::path::PathBuf;
 use std::sync::Mutex;
 
 /// Wykonuje atak brute force na szyfr przestawieniowy, zapisując najlepszy wynik do pliku.
+///
+/// # Arguments
+/// * `input` - Ścieżka do pliku z szyfrogramem przeznaczonym do analizy brute force.
+/// * `output` - Ścieżka do pliku przeznaczonego na najlepszy znaleziony tekst jawny.
+/// * `ngram_ref` - Ścieżka do pliku z referencyjnymi częstotliwościami n-gramów.
+/// * `r` - Rozmiar n-gramów wykorzystywany podczas analizy statystycznej.
 pub fn handle_attack(input: PathBuf, output: PathBuf, ngram_ref: PathBuf, r: u8) {
     let input = open_input(input).expect("Failed to open input file");
     let input = input_parser(input);
@@ -27,6 +33,16 @@ pub fn handle_attack(input: PathBuf, output: PathBuf, ngram_ref: PathBuf, r: u8)
 }
 
 /// Przeszukuje przestrzeń kluczy przesunięcia, korzystając z równoległości i testu chi-kwadrat.
+///
+/// # Arguments
+/// * `input` - Tekst szyfrogramu wczytany do pamięci.
+/// * `ngram_ref` - Znormalizowany rozkład n-gramów służący jako referencja statystyczna.
+/// * `df` - Liczba stopni swobody testu chi-kwadrat wynikająca z rozmiaru alfabetu i n-gramów.
+/// * `p` - Poziom istotności wykorzystywany przy wyznaczaniu wartości krytycznej.
+/// * `r` - Rozmiar n-gramów wykorzystywany podczas analizy statystycznej.
+///
+/// # Zwracana wartość
+/// Zwraca najkorzystniejszą próbę odszyfrowania, wybraną na podstawie statystyki chi-kwadrat.
 fn attack(input: String, ngram_ref: HashMap<String, f64>, df: f64, p: f64, r: u8) -> String {
     let ngram = ngram_generator(&input, r);
     let n = ngram.len() as f64;
@@ -37,6 +53,7 @@ fn attack(input: String, ngram_ref: HashMap<String, f64>, df: f64, p: f64, r: u8
 
     let results: Mutex<Vec<(u8, f64)>> = Mutex::new(Vec::new());
 
+    // Wektory przesunięć są oceniane równolegle, co skraca czas pełnego przeszukania.
     if let Some((i, decrypted)) = (1u8..=25)
         .into_par_iter()
         .filter_map(|i| {
