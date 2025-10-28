@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+/// Tworzy tablicę podstawień realizującą przesunięcie cykliczne alfabetu o `n` pozycji.
 pub fn generate_transposition_key(n: i16) -> HashMap<char, char> {
     let mut key = HashMap::with_capacity(26);
     let shift: u8 = ((n + 26) % 26) as u8;

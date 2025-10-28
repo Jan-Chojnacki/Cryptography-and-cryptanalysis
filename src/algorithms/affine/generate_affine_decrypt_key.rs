@@ -1,6 +1,10 @@
 use bare_metal_modulo::{MNum, ModNum};
 use std::collections::HashMap;
 
+/// Generuje tablicę podstawień deszyfrujących dla szyfru afinicznego.
+///
+/// Oblicza odwrotność modularną parametru `a` i tworzy mapowanie od szyfrogramu do
+/// tekstu jawnego dla wszystkich wielkich liter alfabetu łacińskiego.
 pub fn generate_affine_decrypt_key(a: u32, b: u32) -> HashMap<char, char> {
     const M: i32 = 26;
 

@@ -1,3 +1,5 @@
+//! Operacje analityczne i narzędziowe wykorzystywane przez aplikację z poziomu CLI.
+
 use crate::converters::ngram_to_string;
 use crate::file_handling::{open_input, open_ngram, open_output, save_to_file};
 use crate::file_parsers::{input_parser, ngram_parser};
@@ -5,13 +7,11 @@ use crate::generators::histogram_generator;
 use statrs::distribution::{ChiSquared, ContinuousCDF};
 use std::path::PathBuf;
 
-
+/// Generuje histogram n-gramów z tekstu wejściowego i opcjonalnie zapisuje go do pliku.
 pub fn ngram_generator(input: PathBuf, file: Option<PathBuf>, g: u8) {
     let input = open_input(input).expect("Failed to open input file");
 
-
     let input = input_parser(input);
-
 
     let ngram = crate::generators::ngram_generator(&input, g);
     let histogram = histogram_generator(ngram);
@@ -26,7 +26,7 @@ pub fn ngram_generator(input: PathBuf, file: Option<PathBuf>, g: u8) {
     }
 }
 
-
+/// Wczytuje i wypisuje referencyjne statystyki n-gramów.
 pub fn ngram_reader(file: PathBuf, r: u8) {
     let ngram = open_ngram(file).expect("Failed to open ngram file");
 
@@ -35,7 +35,7 @@ pub fn ngram_reader(file: PathBuf, r: u8) {
     println!("{}", ngram_to_string(ngram));
 }
 
-
+/// Oblicza statystykę chi-kwadrat dla porównania tekstu wejściowego z referencją n-gramów.
 pub fn x2test(input: PathBuf, file: PathBuf, r: u8) {
     let input = open_input(input).expect("Failed to open input file");
 
@@ -43,15 +43,12 @@ pub fn x2test(input: PathBuf, file: PathBuf, r: u8) {
     let ngram = crate::generators::ngram_generator(&input, r);
     let ngram = histogram_generator(ngram);
 
-
     let ngram_ref = open_ngram(file).expect("Failed to open ngram file");
     let ngram_ref = ngram_parser(ngram_ref, r);
 
     let mut x2: f64 = 0.0;
 
-
     let n: u64 = ngram.values().sum();
-
 
     for (k, v) in ngram {
         if let Some(rv) = ngram_ref.get(&k) {
@@ -73,6 +70,3 @@ pub fn x2test(input: PathBuf, file: PathBuf, r: u8) {
         x2, df as u64, critical, reject_h0
     );
 }
-
-
-

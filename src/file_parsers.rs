@@ -1,9 +1,11 @@
+//! Funkcje pomocnicze odpowiedzialne za parsowanie danych wejściowych z plików.
+
 use std::collections::{HashMap, HashSet};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 
-
+/// Czyta plik tekstowy, filtruje znaki do alfabetu łacińskiego i zwraca je w postaci wielkich liter.
 pub fn input_parser(input: File) -> String {
     let reader = BufReader::new(input);
     let mut buf: Vec<String> = Vec::new();
@@ -19,7 +21,7 @@ pub fn input_parser(input: File) -> String {
     buf.join("")
 }
 
-
+/// Buduje mapowanie znaków na podstawie pliku z kluczem, uwzględniając kierunek konwersji.
 pub fn key_parser(key: File, decryption: bool) -> HashMap<char, char> {
     let mut map: HashMap<char, char> = HashMap::new();
     let reader = BufReader::new(key);
@@ -45,7 +47,6 @@ pub fn key_parser(key: File, decryption: bool) -> HashMap<char, char> {
         }
     }
 
-
     let key_test: HashSet<char> = map.iter().map(|(&k, _)| k).collect();
     let value_test: HashSet<char> = map.iter().map(|(_, &v)| v).collect();
 
@@ -56,7 +57,7 @@ pub fn key_parser(key: File, decryption: bool) -> HashMap<char, char> {
     map
 }
 
-
+/// Parsuje plik z częstotliwościami n-gramów i normalizuje wartości do sumy 1.
 pub fn ngram_parser(ngram: File, n: u8) -> HashMap<String, f64> {
     let mut map: Vec<(String, u64)> = Vec::new();
     let reader = BufReader::new(ngram);
@@ -76,12 +77,10 @@ pub fn ngram_parser(ngram: File, n: u8) -> HashMap<String, f64> {
                 panic!("Invalid ngram format.")
             }
 
-
             map.push((key, value));
             sum += value;
         }
     }
-
 
     map.iter()
         .map(|(k, v)| (k.clone(), *v as f64 / sum as f64))
