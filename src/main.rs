@@ -1,3 +1,5 @@
+//! Główna aplikacja CLI kierująca wywołaniami do poszczególnych modułów kryptograficznych.
+
 mod algorithms;
 mod args;
 mod attack;
@@ -15,7 +17,8 @@ use crate::args::{
 use crate::attack::*;
 use clap::Parser;
 
-
+/// Punkt wejścia programu odpowiedzialny za sparsowanie argumentów i delegowanie
+/// wykonania do odpowiednich modułów implementujących algorytmy, operacje i ataki.
 fn main() {
     let args = Args::parse();
 

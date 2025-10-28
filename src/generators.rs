@@ -1,6 +1,8 @@
+//! Funkcje generujące n-gramy i ich histogramy wykorzystywane w analizie statystycznej.
+
 use std::collections::HashMap;
 
-
+/// Tworzy wektor wszystkich n-gramów o zadanym rozmiarze z tekstu wejściowego.
 pub fn ngram_generator(input: &str, ngram_size: u8) -> Vec<String> {
     input
         .as_bytes()
@@ -9,7 +11,7 @@ pub fn ngram_generator(input: &str, ngram_size: u8) -> Vec<String> {
         .collect()
 }
 
-
+/// Buduje histogram częstości występowania n-gramów.
 pub fn histogram_generator(ngram: Vec<String>) -> HashMap<String, u64> {
     ngram
         .iter()

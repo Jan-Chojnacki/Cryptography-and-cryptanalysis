@@ -10,6 +10,7 @@ use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Mutex;
 
+/// Wykonuje atak brute force na szyfr przestawieniowy, zapisując najlepszy wynik do pliku.
 pub fn handle_attack(input: PathBuf, output: PathBuf, ngram_ref: PathBuf, r: u8) {
     let input = open_input(input).expect("Failed to open input file");
     let input = input_parser(input);
@@ -25,6 +26,7 @@ pub fn handle_attack(input: PathBuf, output: PathBuf, ngram_ref: PathBuf, r: u8)
     save_to_file(&buf, output);
 }
 
+/// Przeszukuje przestrzeń kluczy przesunięcia, korzystając z równoległości i testu chi-kwadrat.
 fn attack(input: String, ngram_ref: HashMap<String, f64>, df: f64, p: f64, r: u8) -> String {
     let ngram = ngram_generator(&input, r);
     let n = ngram.len() as f64;

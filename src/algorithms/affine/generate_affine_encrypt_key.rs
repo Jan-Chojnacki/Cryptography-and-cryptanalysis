@@ -1,6 +1,10 @@
 use gcd::euclid_u32;
 use std::collections::HashMap;
 
+/// Buduje mapowanie znaków szyfrujące dla parametrów `a` i `b` szyfru afinicznego.
+///
+/// Funkcja weryfikuje, że `a` jest względnie pierwsze z 26 i zwraca gotową tablicę
+/// podstawień dla wielkich liter alfabetu łacińskiego.
 pub fn generate_affine_encrypt_key(a: u32, b: u32) -> HashMap<char, char> {
     const M: u32 = 26;
 
