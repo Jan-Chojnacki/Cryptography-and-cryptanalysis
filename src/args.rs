@@ -101,17 +101,29 @@ pub enum AttackAlgorithmCommand {
         input: PathBuf,
         #[arg(short, long, value_name = "FILE")]
         output: PathBuf,
+        #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
+        r: u8,
+        #[arg(value_name = "FILE")]
+        file: PathBuf,
     },
     Transposition {
         #[arg(short, long, value_name = "FILE")]
         input: PathBuf,
         #[arg(short, long, value_name = "FILE")]
         output: PathBuf,
+        #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
+        r: u8,
+        #[arg(value_name = "FILE")]
+        file: PathBuf,
     },
     Affine {
         #[arg(short, long, value_name = "FILE")]
         input: PathBuf,
         #[arg(short, long, value_name = "FILE")]
         output: PathBuf,
+        #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
+        r: u8,
+        #[arg(value_name = "FILE")]
+        file: PathBuf,
     },
 }

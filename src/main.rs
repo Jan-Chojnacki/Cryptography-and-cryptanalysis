@@ -1,15 +1,16 @@
 mod algorithms;
 mod args;
-mod attacks;
 mod converters;
 mod file_handling;
 mod file_parsers;
 mod generators;
 mod operations;
+mod attack;
 
 use crate::algorithms::*;
 use crate::args::{AlgorithmCommand, Args, AttackAlgorithmCommand, AttackCommand, Commands, NgramCommand};
 use clap::Parser;
+use crate::attack::*;
 
 /// Entrypoint that parses CLI arguments, validates them and dispatches the
 /// selected operating mode.
@@ -59,14 +60,14 @@ fn main() {
         },
         Commands::Attack { attack_command } => match attack_command {
             AttackCommand::BruteForce { algorithm } => match algorithm {
-                AttackAlgorithmCommand::Substitution { input, output } => {
-                    
+                AttackAlgorithmCommand::Substitution { .. } => {
+
                 }
-                AttackAlgorithmCommand::Transposition { input, output } => {
-                    
+                AttackAlgorithmCommand::Transposition { input, output, file, r } => {
+                    bruteforce::transposition::handle_attack(input, output, file, r);
                 }
-                AttackAlgorithmCommand::Affine { input, output } => {
-                    
+                AttackAlgorithmCommand::Affine { .. } => {
+
                 }
             },
         },
