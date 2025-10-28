@@ -3,6 +3,14 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 /// Buduje mapowanie znaków na podstawie pliku z kluczem, uwzględniając kierunek konwersji.
+///
+/// # Arguments
+/// * `key` - Uchwyt do pliku zawierającego pary znaków opisujące odwzorowanie klucza.
+/// * `decryption` - Flaga określająca kierunek mapowania; `true` oznacza odwrócenie par na
+///   potrzeby deszyfrowania.
+///
+/// # Zwracana wartość
+/// Zwraca kompletną mapę `HashMap<char, char>` zapewniającą bijekcję pomiędzy znakami alfabetu.
 pub fn key_parser(key: File, decryption: bool) -> HashMap<char, char> {
     let mut map: HashMap<char, char> = HashMap::new();
     let reader = BufReader::new(key);

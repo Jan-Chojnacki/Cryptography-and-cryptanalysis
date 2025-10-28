@@ -4,6 +4,13 @@ use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 
 /// Parsuje plik z częstotliwościami n-gramów i oblicza prawdopodobieństwo wystąpienia.
+///
+/// # Arguments
+/// * `ngram` - Uchwyt do pliku tekstowego zawierającego pary `n-gram liczba_wystąpień`.
+/// * `n` - Rozmiar n-gramów, wykorzystywany do walidacji formatu danych wejściowych.
+///
+/// # Zwracana wartość
+/// Zwraca mapę prawdopodobieństw, w której sumy wartości wynoszą `1.0`.
 pub fn ngram_parser(ngram: File, n: u8) -> HashMap<String, f64> {
     let mut map: Vec<(String, u64)> = Vec::new();
     let reader = BufReader::new(ngram);
