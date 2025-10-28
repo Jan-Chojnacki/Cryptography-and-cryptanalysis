@@ -17,7 +17,7 @@ pub fn handle_encrypt(input: PathBuf, output: PathBuf, key: u8) {
     let key = generate_transposition_key(key as i16);
 
     // Substitute each character according to the key mapping.
-    let buf: String = substitute(&input, key);
+    let buf: String = substitute(&input, &key);
 
     // Persist the transformed text to the requested destination.
     save_to_file(&buf, output);
@@ -34,7 +34,7 @@ pub fn handle_decrypt(input: PathBuf, output: PathBuf, key: u8) {
     let key = generate_transposition_key(-(key as i16));
 
     // Substitute each character according to the key mapping.
-    let buf: String = substitute(&input, key);
+    let buf: String = substitute(&input, &key);
 
     // Persist the transformed text to the requested destination.
     save_to_file(&buf, output);

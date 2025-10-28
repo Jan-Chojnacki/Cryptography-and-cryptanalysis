@@ -18,7 +18,7 @@ pub fn handle_encrypt(input: PathBuf, output: PathBuf, a: u32, b: u32) {
     let key = generate_affine_encrypt_key(a, b);
 
     // Substitute each character according to the key mapping.
-    let buf: String = substitute(&input, key);
+    let buf: String = substitute(&input, &key);
 
     // Persist the transformed text to the requested destination.
     save_to_file(&buf, output);
@@ -34,7 +34,7 @@ pub fn handle_decrypt(input: PathBuf, output: PathBuf, a: u32, b: u32) {
     let key = generate_affine_decrypt_key(a, b);
 
     // Substitute each character according to the key mapping.
-    let buf: String = substitute(&input, key);
+    let buf: String = substitute(&input, &key);
 
     // Persist the transformed text to the requested destination.
     save_to_file(&buf, output);

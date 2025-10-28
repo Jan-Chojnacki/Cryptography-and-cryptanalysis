@@ -47,7 +47,7 @@ fn attack(input: String, ngram_ref: HashMap<String, f64>, df: f64, p: f64, r: u8
         .into_par_iter()
         .filter_map(|(a, b)| {
             let key = generate_affine_decrypt_key(a, b);
-            let decrypted = substitute(&input, key);
+            let decrypted = substitute(&input, &key);
 
             let ngram = ngram_generator(&decrypted, r);
             let ngram = histogram_generator(ngram);
@@ -74,5 +74,5 @@ fn attack(input: String, ngram_ref: HashMap<String, f64>, df: f64, p: f64, r: u8
     println!("best_key=(a={}, b={}), best_x2={}", best_a, best_b, best_x2);
 
     let key = generate_affine_decrypt_key(*best_a, *best_b);
-    substitute(&input, key)
+    substitute(&input, &key)
 }

@@ -39,7 +39,7 @@ fn attack(input: String, ngram_ref: HashMap<String, f64>, df: f64, p: f64, r: u8
         .into_par_iter()
         .filter_map(|i| {
             let key = generate_transposition_key(-(i as i16));
-            let decrypted = substitute(&input, key);
+            let decrypted = substitute(&input, &key);
 
             let ngram = ngram_generator(&decrypted, r);
             let ngram = histogram_generator(ngram);
@@ -65,5 +65,5 @@ fn attack(input: String, ngram_ref: HashMap<String, f64>, df: f64, p: f64, r: u8
     let (best_key, best_x2) = results.first().unwrap();
     println!("best_key={}, best_x2={}", best_key, best_x2);
     let key = generate_transposition_key(-(*best_key as i16));
-    substitute(&input, key)
+    substitute(&input, &key)
 }
