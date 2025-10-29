@@ -49,6 +49,7 @@ pub enum Commands {
         /// Ścieżka do pliku z tekstem poddawanym analizie n-gramowej.
         #[arg(short, long)]
         input: PathBuf,
+        /// Pomija n-gramy o liczności mniejszej niż pięć podczas obliczania statystyki chi-kwadrat.
         #[arg(short, long)]
         skip_infrequent: bool,
     },
