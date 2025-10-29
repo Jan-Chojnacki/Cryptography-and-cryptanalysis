@@ -167,7 +167,29 @@ pub struct Args {
     pub commands: Commands,
 }
 ```
+W programie został również zaimplementowana flaga --help dzięki użyciu modułu ```clap```. Poniżej przedstawiono wywołanie programu z tą flagą.
+```shell
+ ./target/debug/Cryptography-and-cryptanalysis --help
+Command line arguments accepted by the application
 
+Usage: Cryptography-and-cryptanalysis [OPTIONS] [FILE]
+
+Arguments:
+  [FILE]  Path to ngram file
+
+Options:
+  -i, --input <FILE>         Path to input file
+  -o, --output <FILE>        Path to output file
+  -k, --key <FILE>           Path to key file
+  -e, --encrypt              Encryption mode
+  -d, --decrypt              Decryption mode
+  -g, --gram <NUMBER>        Ngram generation mode
+  -r, --read-ngram <NUMBER>  Ngram reading mode
+  -s                         Generating x^2 test
+  -h, --help                 Print help
+  -V, --version              Print version
+
+```
 Struktura
 
 ### Zadanie 1
@@ -262,7 +284,6 @@ pub fn handle_encrypt(input: PathBuf, output: PathBuf, key: PathBuf) {
 } 
 ```
 
-
 2. Wywołanie funkcji ```handle_decrypt()```
 ```Rust
 pub fn handle_decrypt(input: PathBuf, output: PathBuf, key: PathBuf) {
@@ -278,6 +299,48 @@ pub fn handle_decrypt(input: PathBuf, output: PathBuf, key: PathBuf) {
     save_to_file(&buf, output);
 }
 ```
+
+Obie funkcje przyjmują w argumencie ścieżki do pliku wejściowego, wyjściowego oraz klucza. Wszystkie te ścieżki są przekazywane przy wywołaniu programu.
+W pierwszej kolejności funkcje otwierają wskazane pliki, następnie wywołują funkcje pomocnicze: ```input_parser()``` i ```key_parser()``` w celu przygotowania tekstu. Na końcu zapisują wynik funkcji pomocniczej ```substitute``` to bufora, ktory zapisuje do pliku wyjściowego. Funkcja nie zwraca żadnych wartości.
+Obie funkcje różnią się jedynie argumentem przekazywanym do funkcji pomocniczej ```key_parser```, której kod przedstawiono poniżej.
+```Rust
+pub fn key_parser(key: File, decryption: bool) -> HashMap<char, char> {
+    let mut map: HashMap<char, char> = HashMap::new();
+    let reader = BufReader::new(key);
+
+    for line in reader.lines() {
+        if let Ok(line) = line {
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() != 2 {
+                panic!("Invalid key format.")
+            }
+            match decryption {
+                false => {
+                    let key = parts[0].chars().next().unwrap();
+                    let value = parts[1].chars().next().unwrap();
+                    map.insert(key, value);
+                }
+                true => {
+                    let key = parts[1].chars().next().unwrap();
+                    let value = parts[0].chars().next().unwrap();
+                    map.insert(key, value);
+                }
+            }
+        }
+    }
+
+    let key_test: HashSet<char> = map.iter().map(|(&k, _)| k).collect();
+    let value_test: HashSet<char> = map.iter().map(|(_, &v)| v).collect();
+
+    if key_test.len() != 26 || value_test.len() != 26 {
+        panic!("Invalid key values.")
+    }
+
+    map
+}
+```
+Funkcja przyjmuje strukturę ```File``` zawierającą informacje o otwartym pliku oraz wartość binarną odpowiedzialną za wybór operacji. W pierwszej kolejności tworzy mapę znaków, następnie zależnie od wartości binarnej przypisuje odpowiednie znaki. Jeśli wartość ```decryption``` jest ustawiona na false, zostaną wczytane znaki z klucza służące do szyfrowania tekstu, jeśli wartość będzie ustawiona na true, zostaną wczytane znaki służące do odszyfrowywania.
+Następnie sprawdzana jest poprawność działania a na końcu funkcja zwraca nowo utworzoną mapę.
 ### Zadanie 2
 
 Rozbudować program z poprzedniego przykładu poprzez dodanie do niego funkcjonalności generowania statystyk licz-
