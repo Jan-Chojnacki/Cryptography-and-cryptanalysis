@@ -167,27 +167,48 @@ pub struct Args {
     pub commands: Commands,
 }
 ```
-W programie został również zaimplementowana flaga --help dzięki użyciu modułu ```clap```. Poniżej przedstawiono wywołanie programu z tą flagą.
+W programie został również zaimplementowana pomoc, która ułatwa obsługę. Poniżej przedstawiono przykładowe wywołanie programu korzystając z pomocy.
 ```shell
- ./target/debug/Cryptography-and-cryptanalysis --help
-Command line arguments accepted by the application
 
-Usage: Cryptography-and-cryptanalysis [OPTIONS] [FILE]
+jakubbabiarski@fedora:~/RustroverProjects/Cryptography-and-cryptanalysis$ ./target/debug/Cryptography-and-cryptanalysis
+Parametry wiersza poleceń kontrolujące działanie aplikacji
 
-Arguments:
-  [FILE]  Path to ngram file
+Usage: Cryptography-and-cryptanalysis <COMMAND>
+
+Commands:
+  encrypt     Szyfrowanie tekstu za pomocą wybranego algorytmu klasycznego
+  decrypt     Deszyfrowanie tekstu za pomocą wybranego algorytmu klasycznego
+  ngram       Operacje na statystykach n-gramowych
+  attack      Uruchomienie ataków kryptograficznych typu brute force
+  similarity  Porównanie podobieństwa rozkładu tekstu wejściowego z referencyjnym
+  help        Print this message or the help of the given subcommand(s)
 
 Options:
-  -i, --input <FILE>         Path to input file
-  -o, --output <FILE>        Path to output file
-  -k, --key <FILE>           Path to key file
-  -e, --encrypt              Encryption mode
-  -d, --decrypt              Decryption mode
-  -g, --gram <NUMBER>        Ngram generation mode
-  -r, --read-ngram <NUMBER>  Ngram reading mode
-  -s                         Generating x^2 test
-  -h, --help                 Print help
-  -V, --version              Print version
+  -h, --help     Print help
+  -V, --version  Print version
+jakubbabiarski@fedora:~/RustroverProjects/Cryptography-and-cryptanalysis$ ./target/debug/Cryptography-and-cryptanalysis enc
+Szyfrowanie tekstu za pomocą wybranego algorytmu klasycznego
+
+Usage: Cryptography-and-cryptanalysis encrypt <COMMAND>
+
+Commands:
+  substitution   Algorytm podstawieniowy z kluczem dostarczonym w pliku
+  transposition  Algorytm przestawieniowy z przesunięciem klucza
+  affine         Algorytm afiniczny z parametrami multiplikatywnym i addytywnym
+  help           Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help  Print help
+jakubbabiarski@fedora:~/RustroverProjects/Cryptography-and-cryptanalysis$ ./target/debug/Cryptography-and-cryptanalysis enc sub
+error: the following required arguments were not provided:
+  --input <INPUT>
+  --output <OUTPUT>
+  --key <KEY>
+
+Usage: Cryptography-and-cryptanalysis encrypt substitution --input <INPUT> --output <OUTPUT> --key <KEY>
+
+For more information, try '--help'.
+jakubbabiarski@fedora:~/RustroverProjects/Cryptography-and-cryptanalysis$ ./target/debug/Cryptography-and-cryptanalysis enc sub -i ./plaintext/alice_wonderland.txt -o ./outputfile/zadanie1.txt -k key.txt 
 
 ```
 Struktura
