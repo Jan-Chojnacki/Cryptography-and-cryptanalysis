@@ -183,9 +183,101 @@ Korzystając z języka Rust, dokonaj implementacji programu szyfrującego i desz
 4. Tryb pracy programu powinien być określony poprzez flagi: -e dla procesu szyfrowania, -d dla procesu deszyfrowania
 
 #### Implementacja
+Fragment funkcji ```main.rs``` odpowiedzialnej za wywołanie funkcjonalności określonej w zadaniu 1.
+```Rust
+fn main() {
+    let args = Args::parse();
+
+    // Dopasowanie wariantu polecenia przekierowujące wykonanie do odpowiedniego modułu.
+    match args.commands {
+        Commands::Encrypt { algorithm_command } => match algorithm_command {
+            AlgorithmCommand::Substitution { input, output, key } => {
+                substitution::handle_encrypt(input, output, key);
+            }
+        }
+        Commands::Decrypt { algorithm_command } => match algorithm_command {
+            AlgorithmCommand::Substitution { input, output, key } => {
+                substitution::handle_decrypt(input, output, key);
+            }
+        }
+    }
+}
+```
+Ten fragment dopasowuje opcje opraz argumenty podane przy wywołaniu do wartości zapisanych w typie enumarate. Poniżej fragment kodu tupy enumerate ```Commands```.
+
+```Rust
+#[derive(Subcommand, Debug)]
+#[command(infer_subcommands = true)]
+pub enum Commands {
+    /// Szyfrowanie tekstu za pomocą wybranego algorytmu klasycznego.
+    Encrypt {
+        /// Podpolecenie określające algorytm i jego parametry.
+        #[command(subcommand)]
+        algorithm_command: AlgorithmCommand,
+    },
+    /// Deszyfrowanie tekstu za pomocą wybranego algorytmu klasycznego.
+    Decrypt {
+        /// Podpolecenie określające algorytm i jego parametry.
+        #[command(subcommand)]
+        algorithm_command: AlgorithmCommand,
+    },
+}
+```
+Typ przechowuje informacje co robić, jeśli w argumencie będzie podana opcja ```Encrypt``` i ```Decrypt```, które określają jaką funkcjonalość ma spełnić program w danej chwili. W obu przypadkach typ pobiera dane z kolejnego typu enumerate.
+
+Fragment kodu typu enmumerate ```AlgorithmCommand```
+```Rust
+/// Wybór algorytmów szyfrowania i ich parametrów.
+#[derive(Subcommand, Debug)]
+pub enum AlgorithmCommand {
+    /// Algorytm podstawieniowy z kluczem dostarczonym w pliku.
+    Substitution {
+        /// Plik z tekstem jawnym lub zaszyfrowanym.
+        #[arg(short, long)]
+        input: PathBuf,
+        /// Plik wyjściowy na wynik szyfrowania bądź deszyfrowania.
+        #[arg(short, long)]
+        output: PathBuf,
+        /// Plik z mapowaniem znaków stanowiącym klucz podstawienia.
+        #[arg(short, long)]
+        key: PathBuf,
+    },
+}
+```
+Typ ten określa jakie argumenty należy podać przy uruchamianiu programu. W tym wypadku jest to plik wejściowy z tekstem, plik wyjściowy z tekstem zmienionym oraz plik klucza, na którego podstawie tekst wejściowy będzie odpowiednio szyfrowany, lub odszyfrowywany.
+Na podstawie powyższych typów enumerate wybierana jest funkcja, która ma się wykonać. Możliwe są 2 wywołania.
+1. Wywołanie funkcji ```handle_encrypt()```
+```Rust
+pub fn handle_encrypt(input: PathBuf, output: PathBuf, key: PathBuf) {
+  let input = open_input(input).expect("Failed to open input file");
+  let output = open_output(output).expect("Failed to open output file");
+  let key = open_key(key).expect("Failed to open key file");
+
+  let input = input_parser(input);
+  let key = key_parser(key, false);
+
+  let buf: String = substitute(&input, &key);
+
+  save_to_file(&buf, output);
+} 
+```
 
 
+2. Wywołanie funkcji ```handle_decrypt()```
+```Rust
+pub fn handle_decrypt(input: PathBuf, output: PathBuf, key: PathBuf) {
+    let input = open_input(input).expect("Failed to open input file");
+    let output = open_output(output).expect("Failed to open output file");
+    let key = open_key(key).expect("Failed to open key file");
 
+    let input = input_parser(input);
+    let key = key_parser(key, true);
+
+    let buf: String = substitute(&input, &key);
+
+    save_to_file(&buf, output);
+}
+```
 ### Zadanie 2
 
 Rozbudować program z poprzedniego przykładu poprzez dodanie do niego funkcjonalności generowania statystyk licz-
