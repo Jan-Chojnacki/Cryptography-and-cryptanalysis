@@ -166,7 +166,6 @@ pub struct Args {
     #[command(subcommand)]
     pub commands: Commands,
 }
-
 ```
 
 Struktura
