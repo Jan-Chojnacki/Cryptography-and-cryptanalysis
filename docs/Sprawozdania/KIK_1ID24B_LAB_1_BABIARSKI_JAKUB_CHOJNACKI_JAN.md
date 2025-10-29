@@ -696,17 +696,21 @@ W pierwszej kolejności funkcja otwiera i przygotowuje plik wejściowy do dalsze
 x^2 dla podanych plików. Na koniec funkcja wyświetla obliczoną wartość. Funkcja nie zwraca wartości.
 
 #### Wyniki
+Stary tekst.
 ```shell
 
 ./target/debug/Cryptography-and-cryptanalysis s  -r2 -i ./plaintext/alice_wonderland.txt ./n-grams/english_bigrams.txt 
 chi2_stat=16707.628274996852, df=675, critical=736.551271135692, reject_H0=true
 ```
-
+Nowy tekst.
 ```shell
+
 ./target/debug/Cryptography-and-cryptanalysis s  -r2 -i ./plaintext/modern.txt ./n-grams/english_bigrams.txt 
 chi2_stat=1152.501001489355, df=675, critical=736.551271135692, reject_H0=true
 ```
+n-gram wygenerowany na podstawie badanego tekstu.
 ```shell
+
 ./target/debug/Cryptography-and-cryptanalysis sim -r 2 -i ./plaintext/modern.txt ./outputfile/modernout.txt 
 chi2_stat=0.000000000000, df=675, critical=736.551271135692, reject_H0=false
 ```
@@ -719,69 +723,59 @@ Dodatkowe watości wypisywane przez program są wykorzystywane w laboratorium 2.
   które rzadko występują w tekście, np w przypadku mono-gramów języka angielskiego są to litery: J, K, Q, X oraz
   Z (patrz odczytana tablica częstości mono-gramów). Zbadaj wynik testu χ2 w przypadku gdy do wyznaczenia
   testu pominięte zostaną rzadko występujące n-gramy
+  Stary tekst.
+#### Przykładowe wyniki
+```shell
 
-#### Wyniki
-
-
-```sh
-
-./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r2 2-grams.txt
-0.00000000000000000000
-
-./target/debug/Cryptography-and-cryptanalysis -s -i fairytale.txt -r2 english_bigrams.txt 
-12181.52784371924099104945
-
-./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r1 english_monograms.txt 
-599.09697433246287801012
+./target/debug/Cryptography-and-cryptanalysis s  -r2 -i ./plaintext/alice_wonderland.txt ./n-grams/english_bigrams.txt 
+chi2_stat=16707.628274996852, df=675, critical=736.551271135692, reject_H0=true
 ```
+Nowy tekst.
+```shell
 
-```sh
-
-./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r2 english_bigrams.txt 
-1210.95027642850368465588
-
-./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r2 english_bigrams.txt 
-1210.95027642850368465588
-
-./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r2 Reduced_bigrams.txt 
-1210.92697753112520331342
-
-./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r2 Reduced_bigrams.txt 
-1210.92697753112520331342
-
+./target/debug/Cryptography-and-cryptanalysis s  -r2 -i ./plaintext/modern.txt ./n-grams/english_bigrams.txt 
+chi2_stat=1152.501001489355, df=675, critical=736.551271135692, reject_H0=true
 ```
+n-gram wygenerowany na podstawie badanego tekstu.
+```shell
 
-```sh
-
-./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r3 english_trigrams.txt 
-3102.87288484137070554425
-
-./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r3 Reduced_trigrams.txt 
-3102.81211819119334904826
-
-./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r3 Reduced_trigrams.txt 
-3102.81211819119334904826
-
-./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r3 english_trigrams.txt 
-3102.87288484137070554425
+./target/debug/Cryptography-and-cryptanalysis sim -r 2 -i ./plaintext/modern.txt ./outputfile/modernout.txt 
+chi2_stat=0.000000000000, df=675, critical=736.551271135692, reject_H0=false
 ```
+#### Wyniki dla monogramów
+```shell
 
-```sh
+./target/debug/Cryptography-and-cryptanalysis  sim -r 1 -i ./plaintext/alice_wonderland.txt ./n-grams/english_monograms.txt 
+chi2_stat=2610.453508530805, df=25, critical=37.652484133483, reject_H0=true
 
-./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r4 english_quadgrams.txt 
-6380.06156763081344251987
+./target/debug/Cryptography-and-cryptanalysis  sim -r 1 -i ./plaintext/modern.txt ./n-grams/english_monograms.txt 
+chi2_stat=149.852351582356, df=25, critical=37.652484133483, reject_H0=true
 
-./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r4 english_quadgrams.txt 
-6380.06156763081344251987
+./target/debug/Cryptography-and-cryptanalysis  sim -r 1 -i ./plaintext/modern2.txt ./n-grams/english_monograms.txt 
+chi2_stat=31.788779765793, df=25, critical=37.652484133483, reject_H0=false
 
-./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r4 Reduced_quadgrams.txt 
-6380.02816471075766457943
-
-./target/debug/Cryptography-and-cryptanalysis -s -i AWout.txt -r4 Reduced_quadgrams.txt 
-6380.02816471075766457943
-
+./target/debug/Cryptography-and-cryptanalysis  sim -r 1 -i ./plaintext/modern3.txt ./n-grams/english_monograms.txt 
+chi2_stat=71.354728599280, df=25, critical=37.652484133483, reject_H0=true
 
 ```
 
-Wyniki funkcji x^2 dla tekstu jawnego oraz odpowiadającego mu tekstu zaszyfrowanego są takie same, skrócenie n-gramów
-zmniejsza wynik.
+#### Wyniki dla bigramów
+```shell
+
+./target/debug/Cryptography-and-cryptanalysis  sim -r 2 -i ./plaintext/modern.txt ./n-grams/english_bigrams.txt 
+chi2_stat=1152.501001489355, df=675, critical=736.551271135692, reject_H0=true
+./target/debug/Cryptography-and-cryptanalysis  sim -r 2 -i ./plaintext/modern2.txt ./n-grams/english_bigrams.txt 
+chi2_stat=515.232519752722, df=675, critical=736.551271135692, reject_H0=false
+./target/debug/Cryptography-and-cryptanalysis  sim -r 2 -i ./plaintext/modern3.txt ./n-grams/english_bigrams.txt 
+chi2_stat=632.509204872693, df=675, critical=736.551271135692, reject_H0=false
+```
+#### Wyniki dla trigramów
+```shell
+
+
+```
+#### Wyniki dla quadgramów
+```shell
+
+
+```
