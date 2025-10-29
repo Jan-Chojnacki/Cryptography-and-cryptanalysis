@@ -635,6 +635,8 @@ Kolejno funkcja przechodzi przez cały plik, dzieląc go po białych znakach. Da
 Na końcu dla każdego n-gramu jest wyliczane prawdopodobieństwo jego wystąpienia.
 
 Drugą częścią tego zadania była implementacja obliczania wartości x^2 dla pliku z tekstem oraz pliku z ngramami.
+
+Fragment kodu funkcji ```main.rs``` obsługujący test x^2.
 ```Rust
 fn main() {
     let args = Args::parse();
@@ -650,8 +652,66 @@ fn main() {
     }
 }
 ```
+```rust
+pub fn handle_x2test(input: PathBuf, file: PathBuf, r: u8, skip_infrequent: bool) {
+    let input = open_input(input).expect("Failed to open input file");
 
+    let input = input_parser(input);
+    let ngram = ngram_generator(&input, r);
+    let ngram = histogram_generator(ngram);
 
+    let ngram_ref = open_ngram(file).expect("Failed to open ngram file");
+    let ngram_ref = ngram_parser(ngram_ref, r);
+
+    let mut x2: f64 = 0.0;
+
+    let n: u64 = ngram.values().sum();
+
+    for (k, v) in ngram {
+        if skip_infrequent && v < 5 {
+            continue
+        }
+        if let Some(rv) = ngram_ref.get(&k) {
+            let e = rv * n as f64;
+            x2 += (v as f64 - e).powi(2) / e;
+        }
+    }
+
+    let df = 26.0f64.powi(r as i32) - 1.0;
+
+    let chi = ChiSquared::new(df).expect("invalid degrees of freedom");
+
+    let critical = chi.inverse_cdf(0.95f64);
+
+    let reject_h0 = x2 >= critical;
+
+    println!(
+        "chi2_stat={:.12}, df={}, critical={:.12}, reject_H0={}",
+        x2, df as u64, critical, reject_h0
+    );
+}
+```
+Funkcja przyjmuje w argumencie ścieżkę do pliku wejściowego, ścieżkę do plkiu zawierającego n-gram, wielkość n-gramu oraz wartość binarną odpowiedzialną za pomijanie ngramów o niskiej częstotliwości występowania.
+W pierwszej kolejności funkcja otwiera i przygotowuje plik wejściowy do dalszej analizy, następnie otwiera i przygotowuje plik z n-gramem. Kolejno oblicza wartość
+x^2 dla podanych plików. Na koniec funkcja wyświetla obliczoną wartość. Funkcja nie zwraca wartości.
+
+#### Wyniki
+```shell
+
+./target/debug/Cryptography-and-cryptanalysis s  -r2 -i ./plaintext/alice_wonderland.txt ./n-grams/english_bigrams.txt 
+chi2_stat=16707.628274996852, df=675, critical=736.551271135692, reject_H0=true
+```
+
+```shell
+./target/debug/Cryptography-and-cryptanalysis s  -r2 -i ./plaintext/modern.txt ./n-grams/english_bigrams.txt 
+chi2_stat=1152.501001489355, df=675, critical=736.551271135692, reject_H0=true
+```
+```shell
+./target/debug/Cryptography-and-cryptanalysis sim -r 2 -i ./plaintext/modern.txt ./outputfile/modernout.txt 
+chi2_stat=0.000000000000, df=675, critical=736.551271135692, reject_H0=false
+```
+Program działa poprawnie. Warto zaznaczyć, że wynik testu x^2 dla tekstu pisanego dzisiejszym językiem jest niższszy niż dla testu używającego starego słownictwa, co oznacza, że tekst nowożytny bardziej pokrywa się zpodanym n-gramem.
+Dodatkowe watości wypisywane przez program są wykorzystywane w laboratorium 2. Są to liczba stopni swobody, wartość krytyczna dla poziomu 0.95 oraz wartość binarna określająca czy tekst znacząco różni się od wzorca.
 ### Zadanie 4
 
 - Dokonaj obserwacji wyniku testu χ2 dla tekstu jawnego i zaszyfrowanego o różnych długościach.
