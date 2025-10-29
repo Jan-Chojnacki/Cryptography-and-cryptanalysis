@@ -31,10 +31,10 @@ fn main() {
     match args.commands {
         Commands::Encrypt { algorithm_command } => match algorithm_command {
             AlgorithmCommand::Substitution { input, output, key } => {
-                substitution::handle_encrypt(input, output, key);
+                substitution::handle_encrypt::handle_encrypt(input, output, key);
             }
             AlgorithmCommand::Transposition { input, output, key } => {
-                transposition::handle_encrypt(input, output, key);
+                transposition::handle_encrypt::handle_encrypt(input, output, key);
             }
             AlgorithmCommand::Affine {
                 input,
@@ -42,15 +42,15 @@ fn main() {
                 a,
                 b,
             } => {
-                affine::handle_encrypt(input, output, a, b);
+                affine::handle_encrypt::handle_encrypt(input, output, a, b);
             }
         },
         Commands::Decrypt { algorithm_command } => match algorithm_command {
             AlgorithmCommand::Substitution { input, output, key } => {
-                substitution::handle_decrypt(input, output, key);
+                substitution::handle_decrypt::handle_decrypt(input, output, key);
             }
             AlgorithmCommand::Transposition { input, output, key } => {
-                transposition::handle_decrypt(input, output, key);
+                transposition::handle_decrypt::handle_decrypt(input, output, key);
             }
             AlgorithmCommand::Affine {
                 input,
@@ -58,7 +58,7 @@ fn main() {
                 a,
                 b,
             } => {
-                affine::handle_decrypt(input, output, a, b);
+                affine::handle_decrypt::handle_decrypt(input, output, a, b);
             }
         },
         Commands::Ngram { ngram_command } => match ngram_command {
