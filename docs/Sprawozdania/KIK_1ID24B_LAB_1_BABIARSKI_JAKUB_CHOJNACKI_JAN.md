@@ -827,6 +827,16 @@ chi2_stat=81603.354101437217, df=456975, critical=458548.624291300424, reject_H0
 ./target/debug/Cryptography-and-cryptanalysis  sim -r 4 -i ./plaintext/modern3.txt ./n-grams/english_quadgrams.txt
 chi2_stat=97821.613627252082, df=456975, critical=458548.624291300424, reject_H0=false
 ```
+
+#### zredukowane n-gramy
+```shell
+
+./target/debug/Cryptography-and-cryptanalysis sim -r 4 -i ./outputfile/newAWout.txt ./n-grams/english_quadgrams.txt -s
+chi2_stat=23926275806.930000305176, df=456975, critical=458548.624291300424, reject_H0=true
+
+./target/debug/Cryptography-and-cryptanalysis sim -r 4 -i ./outputfile/newAWout.txt ./n-grams/english_quadgrams.txt 
+chi2_stat=24215101088.505531311035, df=456975, critical=458548.624291300424, reject_H0=true
+```
 #### Porównanie tekstów na przestrzeni lat
 ```shell
 
@@ -860,3 +870,4 @@ chi2_stat=79736810002.725692749023, df=456975, critical=458548.624291300424, rej
 
 ```
 Test poprzez różnice w wyniku chi2 poprawnie rozróżnia tekst jawny od zaszyfrowanego. Wyniki dla testu zaszyfrowanego są o wiele większe niż dla tekstów jawnych, co udowadnia działanie szyfrowania. Z testu wynika, że stare teksty osiągają niższe wyniki niż teksty nowożytne, jednak to długość tekstów oraz n-gramów jest kluczowym czynnikiem.
+Redukcja najrzadziej występujących n-gramów (mniej niż 5) powoduje obniżenie wyników.
