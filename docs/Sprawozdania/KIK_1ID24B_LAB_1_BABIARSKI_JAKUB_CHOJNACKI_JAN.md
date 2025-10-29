@@ -301,7 +301,7 @@ pub fn handle_decrypt(input: PathBuf, output: PathBuf, key: PathBuf) {
 ```
 
 Obie funkcje przyjmują w argumencie ścieżki do pliku wejściowego, wyjściowego oraz klucza. Wszystkie te ścieżki są przekazywane przy wywołaniu programu.
-W pierwszej kolejności funkcje otwierają wskazane pliki, następnie wywołują funkcje pomocnicze: ```input_parser()``` i ```key_parser()``` w celu przygotowania tekstu. Na końcu zapisują wynik funkcji pomocniczej ```substitute``` to bufora, ktory zapisuje do pliku wyjściowego. Funkcja nie zwraca żadnych wartości.
+W pierwszej kolejności funkcje otwierają wskazane pliki, następnie wywołują funkcje pomocnicze: ```input_parser()``` i ```key_parser()``` w celu przygotowania tekstu. Na końcu zapisują wynik funkcji pomocniczej ```substitute``` to bufora, ktory zapisuje wynik do pliku wyjściowego. Funkcja nie zwraca żadnych wartości.
 Obie funkcje różnią się jedynie argumentem przekazywanym do funkcji pomocniczej ```key_parser```, której kod przedstawiono poniżej.
 ```Rust
 pub fn key_parser(key: File, decryption: bool) -> HashMap<char, char> {
@@ -359,8 +359,34 @@ pub fn input_parser(input: File) -> String {
     buf.join("")
 }
 ```
+Funkcja przyjmuje w argumencie strukturę zawierającą informacje dotyczące otwartego pliku, następnie tworzy wektor łańcuhca znaków i iteruje po nim zapisując jedynie znaki alfabetu angielskiego, które zamienia na wielkie litery, następnie zapisuje je w buforze i zwraca cały łańcuch znaków do funkcji szyfrującej.
 
+Ostatnią funkcją pomocniczą jest funkcja ```substitute()```, której kod pokazano poniżej.
 
+```Rust
+pub fn substitute(input: &str, key: &HashMap<char, char>) -> String {
+    input.chars().map(|x| key.get(&x).unwrap()).collect()
+}
+```
+Funkcja w argumencie przyjmuje plik wejściowy przygotowany przez funkcję ```input_parser``` oraz mapę hash'y z kluczem przygotowanym przez funkcję ```key_parser```, a następnie zamienia znaki zawarte w pliku wejściowym (input) zamienia na odpowiadające znaki z klucza. 
+Funkcja zwraca łancuch znaków z zamienionymi znakami.
+
+#### Wyniki
+Poniżej przedstawiono wynik działania programu z wykorzystaniem różnych plików wejściowych.
+```shell
+
+./target/debug/Cryptography-and-cryptanalysis dec sub -i ./plaintext/alice_wonderland.txt -o ./outputfile/zadanie1.txt -k key.txt 
+head -c 100 ./outputfile/zadanie1.txt 
+LNFDSCYFWLUMLFAHFSUFHCCRCPQOJWFTQVEFALMSFTJABCAVFSOQAVLNJTFHCCRJTPCSLNFMTFCPQAXCAFQAXBNFSFJALNFMAJLF
+```
+```shell
+
+ ./target/debug/Cryptography-and-cryptanalysis enc sub -i ./outputfile/zadanie1.txt -o ./outputfile/outzadanie1.txt -k key.txt 
+head -c 100 ./outputfile/outzadanie1.txt 
+THEPROJECTGUTENBERGEBOOKOFALICESADVENTURESINWONDERLANDTHISEBOOKISFORTHEUSEOFANYONEANYWHEREINTHEUNITE
+```
+
+Oba przypadki działają poprawnie, program szyfruje oraz odszyfrowuje na podstawie podanych parametrów teksty. Polecenie head służy do wypisania ograniczonych do 100 znaków wyników.
 ### Zadanie 2
 
 Rozbudować program z poprzedniego przykładu poprzez dodanie do niego funkcjonalności generowania statystyk licz-
@@ -371,47 +397,74 @@ cjonalność ta powinna być wyzwalana poprzez dodanie do programu jednej z nast
 
 #### Implementacja
 
-Kod źródłowy funkcji ```ngram_generator```
-
+Fragment kodu funkcji ```main.rs``` odpowiedzialna za generowanie statystyk.
 ```Rust
-pub fn ngram_generator(args: Args) {
-    // Gather the input path, output destination and requested n-gram size.
-    let input = args.input.unwrap();
-    let output = args.ngram_file.unwrap();
-    let ngram_size = args.mode_group.gram.unwrap();
+fn main() {
+    let args = Args::parse();
 
-    // Read the plaintext input and prepare the output file.
+    // Dopasowanie wariantu polecenia przekierowujące wykonanie do odpowiedniego modułu.
+    match args.commands {
+        Commands::Ngram { ngram_command } => match ngram_command {
+            NgramCommand::Generate { g, input, file } => {
+                operations::handle_ngram_generate(input, file, g);
+            }
+        }
+    }
+}
+```
+Funkcja odwołuje się do struktury ```Args{}```, która dopasowuje argumenty podane przy wywołaniu programu do typów enumerate ```Commands``` i ```NgramCommand```.
+```Rust
+pub enum Commands {
+    Ngram {
+        /// Podpolecenie definiujące rodzaj operacji na n-gramach.
+        #[command(subcommand)]
+        ngram_command: NgramCommand,
+    },
+}
+```
+```Rust
+pub enum NgramCommand {
+    /// Generuje histogram n-gramów na podstawie wejściowego tekstu.
+    Generate {
+        /// Rozmiar n-gramów do wygenerowania.
+        #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
+        g: u8,
+        /// Plik z tekstem źródłowym wykorzystywanym do analizy.
+        #[arg(short, long)]
+        input: PathBuf,
+        /// Opcjonalny plik wyjściowy na zapisane statystyki n-gramów.
+        #[arg(value_name = "FILE")]
+        file: Option<PathBuf>,
+    },
+}
+```
+Pierwszy typ enumerate odpowiada za włączenie programu w celu wygenerowania n-gramu, drugi odpowiada za ustawienia związane z n-gramami takie jak wielkość n-gramu, ścieżka do pliku wejściowego oraz opcjonalna ścieżka do zapisania n-gramu.
+
+Następnie wywoływana jest funkcja ```handle_ngram_generate()```, której kod pokazano poniżej.
+```Rust
+pub fn handle_ngram_generate(input: PathBuf, file: Option<PathBuf>, g: u8) {
     let input = open_input(input).expect("Failed to open input file");
-    let output = open_output(output).expect("Failed to open output file");
 
-    // Normalise the plaintext prior to n-gram extraction.
     let input = input_parser(input);
 
-    // Build the n-gram list, convert it into a histogram and serialise the result.
-    let ngram = crate::generators::ngram_generator(&input, ngram_size);
+    let ngram = ngram_generator(&input, g);
     let histogram = histogram_generator(ngram);
     let buf = ngram_to_string(histogram);
 
     println!("{buf}");
 
-    // Write the histogram to disk for later use.
-    save_to_file(&buf, output);
+    if let Some(file) = file {
+        let output = open_output(file).expect("Failed to open output file");
+
+        save_to_file(&buf, output);
+    }
 }
 ```
 
-- Funkcja przyjmuje w argumencie strukturę ```args{}```.
-- Funkcja nie zwraca żadnych wartości.
-- Funkcja w pierwszej kolejności przygotowuje dane: odpakowuje je, a następnie otwiera pliki wejścia oraz wyjścia.
-  Kolejno przetwarza otwarty plik funkcją ```input_parser```
-  tak, żeby zawierał jedynie duże litery alfabetu. Następnie przy pomocy funkcji ```ngram_generator()``` z modułu
-  ```generators``` tworzy histogramy wystąpień n-gramów, przy pomocy funkcji ```hisogram_generator()```. Dalej zapisuje
-  histogram do bufora i wypisuje go. Na końcu zapisuje wspomniany bufor do pliku wyjściowego.
-
-Kod źródłowy funkcji ```ngram_generator()``` z modułu ```generators.rs```
-
+Funkcja przyjmuje w argumencie ścieżkę do pliku wejściowego, opcjonalną ścieżkę do pliku wyjściowego oraz wielkość n-gramu. W pierwszej kolejności funkcja otwiera plik, następnie wykorzystuje wcześniej omawianą funcję ```input_parser``` w celu przygotowania pliku, 
+kolejno wywoływana jest funkcja ```ngram_generator```, która tworzy wektor n-gramów, dalej funkcja ```histogram_generator``` tworzy na tej podstawie histogram, dalej przy pomocy ```ngram_to_string``` przygotowuje histogram do wyświetlenia. Na końcu opcjonalnie można zapisać wynik do pliku.
 ```Rust
-   pub fn ngram_generator(input: &str, ngram_size: u8) -> Vec<String> {
-    // Slide over the bytes to capture every n-length subsequence.
+pub fn ngram_generator(input: &str, ngram_size: u8) -> Vec<String> {
     input
         .as_bytes()
         .windows(ngram_size as usize)
@@ -420,85 +473,67 @@ Kod źródłowy funkcji ```ngram_generator()``` z modułu ```generators.rs```
 }
 ```
 
-- Funkcja przyjmuje w argumencie odwołanie do łańcucha znaków oraz długość n-gramu.
-- Funkcja zwraca wektor typu string.
-- Funkcja dzieli tekst wejściowy na bity, następnie tworzy iterator po wszystkich nakładających się elementach o
-  długości podanej w argumencie, kolejno konwertuje buty z powrotem na typ string, a na końcu zapisuje wyniki do
-  wektora, który zwraca.
-
-Kod źródłowy funkcji ```histogram_generator```
+Funkcja ```ngram_generator``` przyjmuje łancuch znaków z plikiem wejściowym oraz wielkość n-gramu do wygenerowania. Przechodzi przez cały łańcuch dzieląc go na okna o wielkości ```ngram_size```
+i zapisuje wynik do wektora łańcucha znaków, który zwraca.
 
 ```Rust
-pub fn histogram_generator(ngram: Vec<String>) -> Vec<(String, u64)> {
-    // Count occurrences of each n-gram using a hash map accumulator.
-    let mut res = ngram
+pub fn histogram_generator(ngram: Vec<String>) -> HashMap<String, u64> {
+    ngram
         .iter()
-        .fold(HashMap::new(), |mut acc, gram| {
+        .fold(HashMap::<String, u64>::new(), |mut acc, gram| {
             *acc.entry(gram.clone()).or_insert(0) += 1;
             acc
         })
-        // Move the aggregated counts into a vector to preserve ordering requirements.
-        .iter()
-        .fold(Vec::new(), |mut acc, (k, v)| {
-            acc.push((k.clone(), *v));
-            acc
-        });
-
-    // Sort the histogram by frequency in descending order.
-    res.sort_by_key(|&(_, v)| v);
-    res.reverse();
-
-    res
 }
-
 ```
 
-- Funkcja przyjmuje w argumencie wektor typu string wygenerowany przez funkcję ``crate::generators::ngram_generator``.
-- Funkcja zwraca wektor zawierający parę wartości, string z n-gramem oraz ilość jego wystąpień w analizowanym tekście.
-- Funkcja iteruje po wektorze n-gramów, jeśli napotkany element nie istniał, dodaje go do mapy i ustawia licznik na
-  zero, następnie zwiększa licznik o 1 z każdym wystąpieniem elementu.
-  Dalej konwertuje mapę na wektor. Na końcu sortuje wartości w wekotrze od największej do najmniejszej i zwraca go.
-
-Kod źródłowy funkcji ```ngram_to_string```
+Funkcja ```histogram_generator``` przyjmuje w argumencie wektor łańcucha znaków zwrócony przez ```ngram_generator```. Przechodzi przez niego oraz zlicza ilość wystąpień
+danego n-gramu i zapisuje wynik do mapy łańcucha znaków, oraz wartośći liczbowej. Jeśli podany n-gram pojawił się pierwszy raz, funkcja dodaje go, ustawia jego wartość na 0 i zwiększa ją o jeden.
+Jeśli n-gram jest już w mapie, funkcja zwiększa wartość o jeden. Ostatecznie funkcja zwraca powstałą mapę.
 
 ```Rust
-pub fn ngram_to_string<T: Display>(input: Vec<(String, T)>) -> String {
-   // Format each entry as "GRAM: VALUE" and concatenate the lines into a single string.
-   input
-           .iter()
-           .map(|(k, v)| format!("{k}: {v}"))
-           .collect::<Vec<_>>()
-           .join("\n")
+pub fn ngram_to_string<T: Display>(input: HashMap<String, T>) -> String {
+    input
+        .iter()
+        .map(|(k, v)| format!("{k} {v}"))
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 ```
-
-- Funkcja przyjmuje w argumencie wektor pary wartości typu string i generycznego typu T.
-- Funkcja zwraca wartość typu string.
-- Funkcja zamienia wektor zawierający n-gramy na wartość typu string. Następnie łączy wszystkie wartości w jednolity
-  tekst, gdzie każdy n-gram jest zapisany w osobnej linii, wraz z ilością jego wystąpień.
-
+Ostatnia funkcja służąca do obsługi generowania n-gramów to ```ngram_to_string```, która przyjmuje w argumencie mapę zwróconą przez funkcję ```histogram_generator```. Przechodzi przez mapę, a następnie
+łączy jej elementy (po jednym n-gramie i przypisanej do niego wartości-ilości wystąpień w linii) i zwraca jako łańcuch znaków.
 #### Wyniki
+Poniżej przedstawiono wyniki działań programu dla różnych tekstów.
+```Shell
 
-Działanie programu do generowania n-gramów. W tym przypadku w argumencie wpisano liczbę 2.
-
-```sh
-
-./target/debug/Cryptography-and-cryptanalysis -g2 -i alice_wonderland.txt 2-grams.txt 
-HE 4041
-TH 4040
-ER 2300
-IN 2284
-AN 1804
-OU 1720
-IT 1536
-ND 1450
-AT 1409
-RE 1404
-
-
+ ./target/debug/Cryptography-and-cryptanalysis ngr gen -g 2 -i ./plaintext/alice_wonderland.txt 
+KQ 1
+EE 648
+SC 131
+KM 11
+YE 124
+KV 4
+GC 24
+RM 178
+EL 674
+NO 699
 ```
 
-Wyniki powinny być zinterpretowane.
+```Shell
+
+./target/debug/Cryptography-and-cryptanalysis ngr gen -g 2 -i ./plaintext/modern.txt 
+CC 2
+TO 94
+YE 5
+JA 3
+DD 6
+DR 15
+GA 20
+UD 6
+AS 74
+RC 4
+```
+
 
 ### Zadanie 3
 
@@ -512,149 +547,61 @@ wyjście.
 
 #### Implementacja
 
-Kod źródłowy funkcji ```ngram_reader```.
-
+Fragment kodu funkcji ```main.rs``` obsługujący funkcjonalność odczytywania n-gramów.
 ```Rust
-pub fn ngram_reader(args: Args) {
-    // Retrieve the histogram path and its associated n-gram size.
-    let input = args.ngram_file.unwrap();
-    let ngram_size = args.mode_group.read_ngram.unwrap();
+fn main() {
+    let args = Args::parse();
 
-    // Load and parse the histogram file to recover its probability distribution.
-    let ngram = open_ngram(input).expect("Failed to open ngram file");
+    // Dopasowanie wariantu polecenia przekierowujące wykonanie do odpowiedniego modułu.
+    match args.commands {
+        Commands::Ngram { ngram_command } => match ngram_command {
+            NgramCommand::Read { r, file } => {
+                operations::handle_ngram_read(file, r);
+            }
+        }
+    }
+}
 
-    let ngram = ngram_parser(ngram, ngram_size);
+```
+
+Funkcja odołuje się do struktury ```Args{}``` i typu enumerate.
+```Rust
+pub enum NgramCommand {
+    /// Generuje histogram n-gramów na podstawie wejściowego tekstu.
+    Generate {
+        /// Rozmiar n-gramów do wygenerowania.
+        #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
+        g: u8,
+        /// Plik z tekstem źródłowym wykorzystywanym do analizy.
+        #[arg(short, long)]
+        input: PathBuf,
+        /// Opcjonalny plik wyjściowy na zapisane statystyki n-gramów.
+        #[arg(value_name = "FILE")]
+        file: Option<PathBuf>,
+    },
+}
+```
+Typ przechowuje informacje o wielkości n-gramu, ścieżki do pliku wejściowego oraz opcjonalnej ścieżki pliku wyjściowego.
+
+Kod źródłowy funkcji ```handle_ngram_read```
+```Rust
+pub fn handle_ngram_read(file: PathBuf, r: u8) {
+    let ngram = open_ngram(file).expect("Failed to open ngram file");
+
+    let ngram = ngram_parser(ngram, r);
 
     println!("{}", ngram_to_string(ngram));
 }
 ```
 
-- Funkcja przyjmuje w argumencie ścieżkę do pliku z zapisanym histogramem n-gramów oraz ich rozmiar.
-- Funkcja nic nie zwraca.
-- Funkcja w pierwszej kolejności wczytuje informacje o n-gramach: ścieżkę do pliku oraz wielkość n-gramu. Następnie
-  otwiera ngram i przy pomocy funkcji ```ngram_parser``` oblicza prawdopodobieństwo wystąpienia n-gramu, a następnie
-  wypisuje go.
+Funkcja przyjmuje w argumencie ścieżkę do pliku wejściowego oraz wielkość odczytywangeo ngramu. Na początku funkcja otwiera plik, następnie przy pomocy ```ngram_parser```
+przygotowuje go a na końcu wypisuje go w postaci łańcucha znaków przy pomocy funkcji ```ngram_to_string```, która była opisana w zadaniu 2.
+Funkcja nie zwraca żadnych argumentów.
 
-Kod źródłowy funkcji ```ngram_parser```.
-
+Kod źródłowy funkcji ```ngram_parser```
 ```Rust
-pub fn ngram_parser(ngram: File, n: u8) -> Vec<(String, f64)> {
-    let mut map: Vec<(String, u64)> = Vec::new();
-    let reader = BufReader::new(ngram);
-
-    let mut sum: u64 = 0;
-
-    for line in reader.lines() {
-        if let Ok(line) = line {
-            let parts: Vec<&str> = line.split_whitespace().collect();
-            if parts.len() != 2 {
-                panic!("Invalid ngram format.")
-            }
-            let key = parts[0].to_string();
-            let value = u64::from_str(parts[1]).unwrap();
-            if key.len() != n as usize {
-                dbg!(key);
-                panic!("Invalid ngram format.")
-            }
-
-            // Track the raw occurrence count before normalising to probabilities.
-            map.push((key, value));
-            sum += value;
-        }
-    }
-
-    // Convert each raw count to a probability using the total number of observations.
-    map.iter()
-        .map(|(k, v)| (k.clone(), *v as f64 / sum as f64))
-        .collect()
-}
-```
-
-- Funkcja przyjmuje otwarty plik z n-gramami.
-- Funcka zwraca wektor pary n-gram i prawdopodobieństwo jego wystąpienia.
-- Funkcja iteruje po wektorze zliczając ilość wszystkich n-gramów, a następnie oblicza prawdopodobieństwo dla każdego
-  n-gramu występującego w tekście.
-
-#### Wyniki
-
-```sh
-
-./target/debug/Cryptography-and-cryptanalysis -r2 2-grams.txt
-HE 0.032762828256621884
-TH 0.03275472065249998
-ER 0.018647489480383653
-IN 0.018517767814433157
-AN 0.014626117835918308
-OU 0.013945079089678208
-IT 0.012453279931247518
-ND 0.011756025976763607
-AT 0.011423614207765463
-RE 0.011383076187155934
-
 
 ```
-
-Program poprawnie wypisuje prawdopodobieństwo wystąpienia n-gramu w pliku.
-
-```Rust
-pub fn x2test(args: Args) {
-    // Obtain the ciphertext path, reference histogram and the n-gram size used for comparison.
-    let input = args.input.unwrap();
-    let ngram_ref = args.ngram_file.unwrap();
-    let ngram_size = args.mode_group.read_ngram.unwrap();
-
-    // Parse the ciphertext and compute its histogram for the requested n-gram length.
-    let input = open_input(input).expect("Failed to open input file");
-
-    let input = input_parser(input);
-    let ngram = crate::generators::ngram_generator(&input, ngram_size);
-    let ngram = histogram_generator(ngram);
-
-    // Load the reference histogram used as the expected distribution.
-    let ngram_ref = open_ngram(ngram_ref).expect("Failed to open ngram file");
-    let ngram_ref = ngram_parser(ngram_ref, ngram_size);
-
-    let mut sum: f64 = 0.0;
-
-    // Total number of observed n-grams in the analysed text.
-    let n: u64 = ngram.iter().map(|(_, num)| num).sum();
-
-    // Apply the chi-squared formula across each n-gram observation.
-    for i in 0..ngram.len() {
-        let e = ngram_ref[i].1 * n as f64;
-        sum += (ngram[i].1 as f64 - e).powi(2) / e
-    }
-
-    // Output the resulting chi-squared statistic for downstream analysis.
-    println!("{sum:.20}")
-}
-```
-
-- Funkcja przyjmuje za argumenty strukturę, wykorzystuje z niej ścieżkę do pliku tekstu wejściowego, ścieżkę do pliku
-  zawierającego n-gramy oraz jego rozmiar.
-- Funkcja nic nie zwraca.
-- Funkcja przygotowuje pliki do analizy, otwiera je i usuwa zbędne znaki (np. spacje) i skleja całość w jeden ciąg
-  znaków. Następnie tworzy z tego pliku histogram n-gramów, który porównuje z histogramem podanym w argumencie funkcji.
-  Następnie oblicza wartość testu x^2 dla podanych plików.
-
-```shell
-
-./target/debug/Cryptography-and-cryptanalysis -s -i alice_wonderland.txt -r2 2-grams.txt
-0.00000000000000000000
-
-```
-
-Program poprawnie porównuje n-gram z plikiem tekstu jawnego. Wynik 0 oznacza, że pliki są takie same, co jest prawdą,
-ponieważ plik ```2-grams.txt``` został wygenerowany na podstawie pliku ```alice_wonderlands```. Poniżej przedstawiono
-przykład dla n-gramu, który nie jest powiązany z plikiem źródłowym.
-
-```shell
-
-./target/debug/Cryptography-and-cryptanalysis -s -i fairytale.txt -r2 english_bigrams.txt 
-12181.52784371924099104945
-
-```
-
 ### Zadanie 4
 
 - Dokonaj obserwacji wyniku testu χ2 dla tekstu jawnego i zaszyfrowanego o różnych długościach.
@@ -665,7 +612,6 @@ przykład dla n-gramu, który nie jest powiązany z plikiem źródłowym.
 
 #### Wyniki
 
-Wyniki
 
 ```sh
 
