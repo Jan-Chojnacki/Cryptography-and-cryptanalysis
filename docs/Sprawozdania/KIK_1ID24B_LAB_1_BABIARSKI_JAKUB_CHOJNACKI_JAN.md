@@ -762,20 +762,75 @@ chi2_stat=71.354728599280, df=25, critical=37.652484133483, reject_H0=true
 #### Wyniki dla bigramów
 ```shell
 
+./target/debug/Cryptography-and-cryptanalysis  sim -r 2 -i ./plaintext/alice_wonderland.txt ./n-grams/english_bigrams.txt
+chi2_stat=16707.628274996849, df=675, critical=736.551271135692, reject_H0=true
+
 ./target/debug/Cryptography-and-cryptanalysis  sim -r 2 -i ./plaintext/modern.txt ./n-grams/english_bigrams.txt 
 chi2_stat=1152.501001489355, df=675, critical=736.551271135692, reject_H0=true
+
 ./target/debug/Cryptography-and-cryptanalysis  sim -r 2 -i ./plaintext/modern2.txt ./n-grams/english_bigrams.txt 
 chi2_stat=515.232519752722, df=675, critical=736.551271135692, reject_H0=false
+
 ./target/debug/Cryptography-and-cryptanalysis  sim -r 2 -i ./plaintext/modern3.txt ./n-grams/english_bigrams.txt 
 chi2_stat=632.509204872693, df=675, critical=736.551271135692, reject_H0=false
+
 ```
 #### Wyniki dla trigramów
 ```shell
 
+./target/debug/Cryptography-and-cryptanalysis  sim -r 3 -i ./plaintext/alice_wonderland.txt ./n-grams/english_trigrams.txt
+chi2_stat=125110.842260517835, df=17575, critical=17884.515475316402, reject_H0=true
+
+./target/debug/Cryptography-and-cryptanalysis  sim -r 3 -i ./plaintext/modern.txt ./n-grams/english_trigrams.txt
+chi2_stat=10230.183787586455, df=17575, critical=17884.515475316402, reject_H0=false
+
+./target/debug/Cryptography-and-cryptanalysis  sim -r 3 -i ./plaintext/modern2.txt ./n-grams/english_trigrams.txt
+chi2_stat=6626.021666341579, df=17575, critical=17884.515475316402, reject_H0=false
+
+./target/debug/Cryptography-and-cryptanalysis  sim -r 3 -i ./plaintext/modern3.txt ./n-grams/english_trigrams.txt
+chi2_stat=7809.871391606195, df=17575, critical=17884.515475316402, reject_H0=false
 
 ```
 #### Wyniki dla quadgramów
 ```shell
+
+./target/debug/Cryptography-and-cryptanalysis  sim -r 4 -i ./plaintext/alice_wonderland.txt ./n-grams/english_quadgrams.txt
+chi2_stat=1393987.801391543588, df=456975, critical=458548.624291300424, reject_H0=true
+
+/target/debug/Cryptography-and-cryptanalysis  sim -r 4 -i ./plaintext/modern.txt ./n-grams/english_quadgrams.txt
+chi2_stat=131411.971595547599, df=456975, critical=458548.624291300424, reject_H0=false
+
+./target/debug/Cryptography-and-cryptanalysis  sim -r 4 -i ./plaintext/modern2.txt ./n-grams/english_quadgrams.txt
+chi2_stat=81603.354101437217, df=456975, critical=458548.624291300424, reject_H0=false
+
+./target/debug/Cryptography-and-cryptanalysis  sim -r 4 -i ./plaintext/modern3.txt ./n-grams/english_quadgrams.txt
+chi2_stat=97821.613627252082, df=456975, critical=458548.624291300424, reject_H0=false
+```
+#### Porównanie tekstów na przestrzeni lat
+```shell
+
+./target/debug/Cryptography-and-cryptanalysis  sim -r 2 -i ./plaintext/alice_wonderland.txt ./n-grams/english_bigrams.txt
+chi2_stat=16707.628274996849, df=675, critical=736.551271135692, reject_H0=true
+
+ ./target/debug/Cryptography-and-cryptanalysis  sim -r 2 -i ./plaintext/modern_story_text.txt ./n-grams/english_bigrams.txt
+chi2_stat=39901.071129342126, df=675, critical=736.551271135692, reject_H0=true
+
+```
+
+```shell
+
+./target/debug/Cryptography-and-cryptanalysis  sim -r 4 -i ./plaintext/alice_wonderland.txt ./n-grams/english_quadgrams.txt
+chi2_stat=1393987.801391543588, df=456975, critical=458548.624291300424, reject_H0=true
+
+ ./target/debug/Cryptography-and-cryptanalysis sim -r 2 -i ./outputfile/newAWout.txt ./n-grams/english_bigrams.txt 
+chi2_stat=56772629.247402794659, df=675, critical=736.551271135692, reject_H0=true
+
+./target/debug/Cryptography-and-cryptanalysis  sim -r 4 -i ./plaintext/modern_story_text.txt ./n-grams/english_quadgrams.txt
+chi2_stat=7881424.411204098724, df=456975, critical=458548.624291300424, reject_H0=true
+
+./target/debug/Cryptography-and-cryptanalysis sim -r 2 -i ./outputfile/new_storyout.txt ./n-grams/english_bigrams.txt 
+chi2_stat=82451591.583299383521, df=675, critical=736.551271135692, reject_H0=true
+
 
 
 ```
