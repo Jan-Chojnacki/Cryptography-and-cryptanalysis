@@ -600,8 +600,58 @@ Funkcja nie zwraca żadnych argumentów.
 
 Kod źródłowy funkcji ```ngram_parser```
 ```Rust
+pub fn ngram_parser(ngram: File, n: u8) -> HashMap<String, f64> {
+    let mut map: Vec<(String, u64)> = Vec::new();
+    let reader = BufReader::new(ngram);
 
+    let mut sum: u64 = 0;
+
+    for line in reader.lines() {
+        if let Ok(line) = line {
+            let parts: Vec<&str> = line.split_whitespace().collect();
+            if parts.len() != 2 {
+                panic!("Invalid ngram format.")
+            }
+            let key = parts[0].to_string();
+            let value = u64::from_str(parts[1]).unwrap();
+            if key.len() != n as usize {
+                dbg!(key);
+                panic!("Invalid ngram format.")
+            }
+
+            map.push((key, value));
+            sum += value;
+        }
+    }
+
+    map.iter()
+        .map(|(k, v)| (k.clone(), *v as f64 / sum as f64))
+        .collect()
+}
 ```
+
+Funkcja przyjmuje w argumencie ngram oraz jego wielkość. Następnie tworzony jest wektor map do tymczasowego przechowywania wartości.
+Kolejno funkcja przechodzi przez cały plik, dzieląc go po białych znakach. Dalej funkcja zlicza ilość wystąpień danego n-gramu oraz sumuje ilość wszystkich n-gramów.
+Na końcu dla każdego n-gramu jest wyliczane prawdopodobieństwo jego wystąpienia.
+
+Drugą częścią tego zadania była implementacja obliczania wartości x^2 dla pliku z tekstem oraz pliku z ngramami.
+```Rust
+fn main() {
+    let args = Args::parse();
+    match args.commands {
+        Commands::Similarity {
+            r,
+            input,
+            file,
+            skip_infrequent,
+        } => {
+            operations::handle_x2test(input, file, r, skip_infrequent);
+        }
+    }
+}
+```
+
+
 ### Zadanie 4
 
 - Dokonaj obserwacji wyniku testu χ2 dla tekstu jawnego i zaszyfrowanego o różnych długościach.
