@@ -52,6 +52,8 @@ pub fn handle_ngram_read(file: PathBuf, r: u8) {
 /// * `input` - Ścieżka do pliku z tekstem poddawanym analizie n-gramowej.
 /// * `file` - Ścieżka do pliku zawierającego referencyjne częstotliwości n-gramów.
 /// * `r` - Rozmiar n-gramów wykorzystywany podczas analizy statystycznej.
+/// * `skip_infrequent` - Pomija n-gramy o liczności mniejszej niż pięć podczas obliczania
+///   statystyki chi-kwadrat.
 pub fn handle_x2test(input: PathBuf, file: PathBuf, r: u8, skip_infrequent: bool) {
     let input = open_input(input).expect("Failed to open input file");
 
