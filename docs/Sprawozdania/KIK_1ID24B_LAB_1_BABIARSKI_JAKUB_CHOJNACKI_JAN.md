@@ -825,12 +825,17 @@ chi2_stat=1393987.801391543588, df=456975, critical=458548.624291300424, reject_
  ./target/debug/Cryptography-and-cryptanalysis sim -r 2 -i ./outputfile/newAWout.txt ./n-grams/english_bigrams.txt 
 chi2_stat=56772629.247402794659, df=675, critical=736.551271135692, reject_H0=true
 
+./target/debug/Cryptography-and-cryptanalysis sim -r 4 -i ./outputfile/newAWout.txt ./n-grams/english_quadgrams.txt 
+chi2_stat=24215101088.505325317383, df=456975, critical=458548.624291300424, reject_H0=true
+
 ./target/debug/Cryptography-and-cryptanalysis  sim -r 4 -i ./plaintext/modern_story_text.txt ./n-grams/english_quadgrams.txt
 chi2_stat=7881424.411204098724, df=456975, critical=458548.624291300424, reject_H0=true
 
 ./target/debug/Cryptography-and-cryptanalysis sim -r 2 -i ./outputfile/new_storyout.txt ./n-grams/english_bigrams.txt 
 chi2_stat=82451591.583299383521, df=675, critical=736.551271135692, reject_H0=true
 
-
+./target/debug/Cryptography-and-cryptanalysis sim -r 4 -i ./outputfile/new_storyout.txt ./n-grams/english_quadgrams.txt 
+chi2_stat=79736810002.725692749023, df=456975, critical=458548.624291300424, reject_H0=true
 
 ```
+Test poprzez różnice w wyniku chi2 poprawnie rozróżnia tekst jawny od zaszyfrowanego. Wyniki dla testu zaszyfrowanego są o wiele większe niż dla tekstów jawnych, co udowadnia działanie szyfrowania. Z testu wynika, że stare teksty osiągają niższe wyniki niż teksty nowożytne, jednak to długość tekstów oraz n-gramów jest kluczowym czynnikiem.
