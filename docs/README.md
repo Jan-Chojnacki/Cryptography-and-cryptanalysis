@@ -229,16 +229,39 @@ pub fn handle_encrypt(input: PathBuf, output: PathBuf, key: u8) {
 }
 ```
 Funkcja przyjmuje w argumencie ścieżkę do pliku wejściowego i wyjściowego oraz wartość oznaczającą klucz. W pierwszej kolejności otwierane są pliki, następnie przygotowywany jest plik wejściowy
-za pomocą funkcji ```input_parser``` wykorzystywanej przy porzednim laboratorium. 
+za pomocą funkcji ```input_parser``` wykorzystywanej przy porzednim laboratorium. Kolejno generowany jest klucz przy pomocy ```generate_transposition_key```. Na końcu nastęþuje wywołanie funkcji ```substitute``` dokonującej zamiany znaków oraz zapisanie wyniku do pliku wyjściowego.
+
+Kod źródłowy funkcji ```generate_transposition_key``` wywoływanej przez funkcję ```handle_encrypt```.
+```rust
+pub fn generate_transposition_key(n: i16) -> HashMap<char, char> {
+    let mut key = HashMap::with_capacity(26);
+    let shift: u8 = ((n + 26) % 26) as u8;
+
+    for i in 0..26 {
+        let from = (b'A' + i) as char;
+        let to = (b'A' + ((i + shift) % 26)) as char;
+        key.insert(from, to);
+    }
+
+    key
+}
+```
+
+Funkcja przyjmuje w argumencie klucz podany przy wywołaniu programu. W pierwszej kolejności tworzy 26 elementową mapę znaków, następnie obliczane jest przesunięcie.
+Kolejno wykonywane jest oblicznie nowego alfabetu z uwzględnieniem przesunięcia oraz dodanie go do mapy, którą funkcja zwraca.
 #### Wyniki
 
 W tej sekcji powinny być przedstawione wyniki pracy programu
 
 ``` sh
-RESULT
+
+head -c 100 ./plaintext/alice_wonderland.txt 
+THEPROJECTGUTENBERGEBOOKOFALICESADVENTURESINWONDERLANDTHISEBOOKISFORTHEUSEOFANYONEANYWHEREINTHEUNITE
+
+head -c 100 ./ciphertext/alice.txt 
+WKHSURMHFWJXWHQEHUJHERRNRIDOLFHVDGYHQWXUHVLQZRQGHUODQGWKLVHERRNLVIRUWKHXVHRIDQBRQHDQBZKHUHLQWKHXQLWH
 ```
 
-Wyniki powinny być zinterpretowane.
 
 ### Zadanie 2
 
@@ -246,25 +269,45 @@ Rozbuduj program z poprzedniego zadania poprzez implementację ataku typu brute-
 wany przy pomocy algorytmu przesuwnego.
 
 #### Implementacja
-
+Fragment kodu funkcji ```main.rs``` obsługujący symulację ataku typu BruteForce na szyfrowanie przestawienne.
 ```Rust
 fn main(){
-    
+   let args = Args::parse();
+
+   // Dopasowanie wariantu polecenia przekierowujące wykonanie do odpowiedniego modułu.
+   match args.commands {
+       Commands::Attack { attack_command } => match attack_command {
+           AttackCommand::BruteForce { algorithm } => match algorithm {
+               AttackAlgorithmCommand::Transposition { args } => {
+                   let AttackArgs {
+                       input,
+                       output,
+                       file,
+                       r,
+                   } = args;
+                   bruteforce::transposition::handle_attack(input, output, file, r);
+               }
+           }
+       }
+   }
 }
 ```
-
-Kod źródłowy powinien być podzielony na części (definicje i funkcje). Każdy fragment programu powinien być opisany:
-
-- co jest wejściem funkcji
-- co jest wyjściem funkcji
-- co implementuje dana funkcja
+Wywołuje funkcję ```handle_attack```, która w argumencie przyjmuje ścieżkę do pliku wejściowego, wyjściowego, zawierającego n-gramy oraz wartość określająca wielkość wykorzystanego n-gramu.
+W pierwszej kolejności funkcja przygotowuje plik wejściowy oraz plik z-gramem poprzez otwarcie ich, oraz usunięciu niepotrzebnych znaków za pomocą funkcji z odpiskiem ```parser```
+Następnie 
 
 #### Wyniki
 
 W tej sekcji powinny być przedstawione wyniki pracy programu
 
-``` sh
-RESULT
+```shell
+
+./target/debug/Cryptography-and-cryptanalysis at br tr -i ./ciphertext/alice.txt -o ./plaintext/alice_wonderland.txt -r 3 ./n-grams/english_trigrams.txt 
+Failed to find key.
+best_key=3, best_x2=125110.842260518
+
+./target/debug/Cryptography-and-cryptanalysis at br tr -i ./ciphertext/alice.txt -o ./plaintext/alice_wonderland.txt -r 3 ./n-grams/alice_trigrams.txt 
+key=3
 ```
 
 ### Zadanie 3
