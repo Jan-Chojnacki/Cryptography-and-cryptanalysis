@@ -341,6 +341,26 @@ pub fn key_parser(key: File, decryption: bool) -> HashMap<char, char> {
 ```
 Funkcja przyjmuje strukturę ```File``` zawierającą informacje o otwartym pliku oraz wartość binarną ```decrytpion``` odpowiedzialną za wybór operacji. W pierwszej kolejności tworzy mapę znaków, następnie zależnie od wartości binarnej przypisuje odpowiednie znaki. Jeśli wartość ```decryption``` jest ustawiona na false, zostaną wczytane znaki z klucza służące do szyfrowania tekstu, jeśli wartość będzie ustawiona na true, zostaną wczytane znaki służące do odszyfrowywania.
 Następnie sprawdzana jest poprawność działania, a na końcu funkcja zwraca nowo utworzoną mapę.
+Następną funkcją wywoływaną w funkcjach obsługujących szyfrowanie i odszyfrowanie jest funkcja ```input_parser```, której kod zaprezentowano poniżej.
+
+```Rust
+pub fn input_parser(input: File) -> String {
+    let reader = BufReader::new(input);
+    let mut buf: Vec<String> = Vec::new();
+
+    for line in reader.lines() {
+        if let Ok(line) = line {
+            let filtered_string: String =
+                line.chars().filter(|c| c.is_ascii_alphabetic()).collect();
+            buf.push(filtered_string.to_uppercase())
+        }
+    }
+
+    buf.join("")
+}
+```
+
+
 ### Zadanie 2
 
 Rozbudować program z poprzedniego przykładu poprzez dodanie do niego funkcjonalności generowania statystyk licz-
