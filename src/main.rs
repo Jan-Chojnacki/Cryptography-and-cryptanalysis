@@ -4,8 +4,8 @@ mod algorithms;
 mod args;
 mod attack;
 mod file_handling;
-mod operations;
 mod ngram;
+mod operations;
 
 use crate::algorithms::*;
 use crate::args::{
@@ -91,8 +91,13 @@ fn main() {
                 }
             },
         },
-        Commands::Similarity { r, input, file } => {
-            operations::handle_x2test(input, file, r);
+        Commands::Similarity {
+            r,
+            input,
+            file,
+            skip_infrequent,
+        } => {
+            operations::handle_x2test(input, file, r, skip_infrequent);
         }
     }
 }

@@ -52,7 +52,7 @@ pub fn handle_ngram_read(file: PathBuf, r: u8) {
 /// * `input` - Ścieżka do pliku z tekstem poddawanym analizie n-gramowej.
 /// * `file` - Ścieżka do pliku zawierającego referencyjne częstotliwości n-gramów.
 /// * `r` - Rozmiar n-gramów wykorzystywany podczas analizy statystycznej.
-pub fn handle_x2test(input: PathBuf, file: PathBuf, r: u8) {
+pub fn handle_x2test(input: PathBuf, file: PathBuf, r: u8, skip_infrequent: bool) {
     let input = open_input(input).expect("Failed to open input file");
 
     let input = input_parser(input);
@@ -67,6 +67,9 @@ pub fn handle_x2test(input: PathBuf, file: PathBuf, r: u8) {
     let n: u64 = ngram.values().sum();
 
     for (k, v) in ngram {
+        if skip_infrequent && v < 5 {
+            continue
+        }
         if let Some(rv) = ngram_ref.get(&k) {
             let e = rv * n as f64;
             x2 += (v as f64 - e).powi(2) / e;

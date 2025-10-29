@@ -49,6 +49,8 @@ pub enum Commands {
         /// Ścieżka do pliku z tekstem poddawanym analizie n-gramowej.
         #[arg(short, long)]
         input: PathBuf,
+        #[arg(short, long)]
+        skip_infrequent: bool,
     },
 }
 
