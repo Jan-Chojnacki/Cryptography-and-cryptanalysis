@@ -7,6 +7,7 @@
 ### Autorzy: Jakub Babiarski, Jan Chojnacki
 ```mermaid
 flowchart TD
+    flowchart TD
     A[Wejście]
     B(Odczytywanie i walidacja poprawności kombinacji argumentów)
     C(Walidacja ścieżek przekazanych w argumentach)
@@ -41,6 +42,13 @@ flowchart TD
     T5(Obliczenie wyniku testu)
     T6(Wypisanie wyniku testu na standardowe wyjście)
 
+    A1(Otwarcie plików przekazanych w argumentach)
+    A2(Przetworzenie zawartości wejścia)
+    A3{Sprawdzanie kluczy do pierwszego trafienia}
+    A4(Wypisanie klucza na standardowe wyjście)
+    A5(Zapisanie odszyfrowanego tekstu do pliku)
+    A6(Wypisanie najbardziej prawdopodobnego klucza na standardowe wyjście)
+
     A --> B
     B --> C
     C --> D
@@ -50,6 +58,8 @@ flowchart TD
     D --> |Generowanie n-gramu| G1 --> G2 --> G3 --> G4 --> G5 --> F
     D --> |Odczytywanie n-gramu| O1 --> O2 --> O3 --> O4 --> F
     D --> |Test x^2| T1 --> T2 --> T3 --> T4 --> T5 --> T6 --> F
+    D --> |Atak| A1 --> A2 --> A3 --> |Pewne trafienie| A4 --> A5 --> F
+    A3 --> |Brak penwego trafienia| A6 --> A5
 ```
 ### Baza projektu
 ```Rust
