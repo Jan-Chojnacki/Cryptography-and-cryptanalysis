@@ -579,12 +579,22 @@ fn attack(input: String, ngram_ref: HashMap<String, f64>, df: f64, p: f64, r: u8
     substitute(&input, &key)
 }
 ```
-
+Funkcja przyjmuje za argumenty łańcuch znaków z pliku wejściowego, mapę zaweirającą informację o n-gramach, wartości df, p oraz wielkość n-gramu.
+Na początku funkcja oblicza częstotliwość występowania n-gramów oraz wartość oczekiwaną. Kolejno obliczane są wartości testu x^2 oraz wartość krytyczna. Dalej następuje równoległe przeszukiwanie przestrzeni kluczy i zapisywanie wynikóœ
+do wektora opartego na mutexie. Jeśli w przestrzeni znaleziono pasujący klucz program przerywa działanie i wypisuje pasujący klucz. Jednak jeśli nie znajdzie żadnego pasującego wyniku, to
+wypisze najbliższą wartość (najmniejszy x^2)
 
 #### Wyniki
 
 W tej sekcji powinny być przedstawione wyniki pracy programu
 
 ``` sh
-RESULT
+
+ ./target/debug/Cryptography-and-cryptanalysis a br af -i ./ciphertext/affineAlice.txt -o ./outputfile/aliceaffine.txt -r 2 ./n-grams/english_bigrams.txt 
+Failed to find key.
+best_key=(a=11, b=5), best_x2=16707.628274996852
+
+ ./target/debug/Cryptography-and-cryptanalysis a br af -i ./ciphertext/affineAlice.txt -o ./outputfile/aliceaffine.txt -r 3 ./n-grams/alice_trigrams.txt 
+key=(a=11, b=5)
 ```
+
