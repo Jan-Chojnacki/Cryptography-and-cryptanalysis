@@ -595,7 +595,6 @@ wypisze najbliższą wartość (najmniejszy x^2)
 
 #### Wyniki
 
-W tej sekcji powinny być przedstawione wyniki pracy programu
 
 ``` sh
 
@@ -606,4 +605,4 @@ best_key=(a=11, b=5), best_x2=16707.628274996852
  ./target/debug/Cryptography-and-cryptanalysis a br af -i ./ciphertext/affineAlice.txt -o ./outputfile/aliceaffine.txt -r 3 ./n-grams/alice_trigrams.txt 
 key=(a=11, b=5)
 ```
-
+Program działa prawidłowo. 
