@@ -213,7 +213,7 @@ pub enum AlgorithmCommand {
 ```
 
 Zasada działania typu enumerate jest identyczna jak przy laboratorium 1. Metoda match porównuje argumenty podane przy wywołaniu programu z zawartością typu enumerate i na tej podstawie podejmuje decyzje które części kodu wykonać.
-Poniżej przedstawiono kod funkcji ```handle_encrypt``` wywoływanej przy wybraniu opcji szyfru przestawiennego.
+Poniżej przedstawiono kod funkcji ```/transpostition/handle_encrypt``` wywoływanej przy wybraniu opcji szyfru przestawiennego.
 ```rust
 pub fn handle_encrypt(input: PathBuf, output: PathBuf, key: u8) {
    let input = open_input(input).expect("Failed to open input file");
@@ -294,11 +294,79 @@ fn main(){
 ```
 Wywołuje funkcję ```handle_attack```, która w argumencie przyjmuje ścieżkę do pliku wejściowego, wyjściowego, zawierającego n-gramy oraz wartość określająca wielkość wykorzystanego n-gramu.
 W pierwszej kolejności funkcja przygotowuje plik wejściowy oraz plik z-gramem poprzez otwarcie ich, oraz usunięciu niepotrzebnych znaków za pomocą funkcji z odpiskiem ```parser```
-Następnie 
+Następnie obliczana jest liczba stopni swobody i ustawiana jest wartość krytyczna. Koejno jest wywoływana funkcja attack. Na końcu wynik jest zapisywany do pliku wyjściowego.
 
+Kod źródłowy funkcji ```handle_attack```.
+```rust
+pub fn handle_attack(input: PathBuf, output: PathBuf, ngram_ref: PathBuf, r: u8) {
+    let input = open_input(input).expect("Failed to open input file");
+    let input = input_parser(input);
+
+    let ngram_ref = open_ngram(ngram_ref).expect("Failed to open ngram file");
+    let ngram_ref = ngram_parser(ngram_ref, r);
+
+    let df = 26.0f64.powi(r as i32) - 1.0;
+    let p = 0.95f64;
+
+    let buf = attack(input, ngram_ref, df, p, r);
+    let output = open_output(output).expect("Failed to open output file");
+    save_to_file(&buf, output);
+}
+```
+
+Funkcja ```attack``` odpowiada za główną logikę działania aplikacji przy przeprowadzaniu ataków łamiących szyfrowanie. Poniżej zaprezentowano jej kod.
+```rust
+fn attack(input: String, ngram_ref: HashMap<String, f64>, df: f64, p: f64, r: u8) -> String {
+    let ngram = ngram_generator(&input, r);
+    let n = ngram.len() as f64;
+    let ngram_ref = ngram_ref.iter().map(|(k, v)| (k.clone(), v * n)).collect();
+
+    let chi = ChiSquared::new(df).expect("invalid degrees of freedom");
+    let critical = chi.inverse_cdf(p);
+
+    let results: Mutex<Vec<(u8, f64)>> = Mutex::new(Vec::new());
+
+    // Wektory przesunięć są oceniane równolegle, co skraca czas pełnego przeszukania.
+    if let Some((i, decrypted)) = (1u8..=25)
+        .into_par_iter()
+        .filter_map(|i| {
+            let key = generate_transposition_key(-(i as i16));
+            let decrypted = substitute(&input, &key);
+
+            let ngram = ngram_generator(&decrypted, r);
+            let ngram = histogram_generator(ngram);
+
+            match x2test(&ngram, &ngram_ref, critical) {
+                Ok(_) => Some((i, decrypted)),
+                Err(x2) => {
+                    results.lock().unwrap().push((i, x2));
+                    None
+                }
+            }
+        })
+        .find_any(|_| true)
+    {
+        println!("key={}", i);
+        return decrypted;
+    }
+
+    println!("Failed to find key.");
+    let mut results = results.into_inner().unwrap();
+    results.sort_by(|a, b| a.1.total_cmp(&b.1));
+
+    let (best_key, best_x2) = results.first().unwrap();
+    println!("best_key={}, best_x2={}", best_key, best_x2);
+    let key = generate_transposition_key(-(*best_key as i16));
+    substitute(&input, &key)
+}
+```
+
+Funkcja przyjmuje w argumencie łańcuch znaków z pliku wejściowego, mapę zawierającą n-gramy wraz z ilością ich powtórzeń, wartość stopni swobody, poziom istotności oraz wielkość n-gramu.
+W pierwszej kolejności wyliczane jest prawdopodobieństwo wystąpienia każdego n-gramu, następnie liczony jest liczony punkt krytycnzy na podstawie poziomu istotności. Dalej tworzony jest mutex
+zapisujący wyniki. W dalszej części oceniane są wartości przesunięcia. Jeśli znajdzie się chociaż jedno przesunięcie zwracające wartość ``ok``, program przerywa szukanie i
+wypisuje wynik. Jeśli program nie znajdzie idealnego dopasowania to zwróci najlepiej dopasowany wynik, oraz wartość x^2 dla niego.
 #### Wyniki
 
-W tej sekcji powinny być przedstawione wyniki pracy programu
 
 ```shell
 
@@ -317,23 +385,94 @@ Napisz program analogiczny do programu z zadania 1, który tym razem implementuj
 #### Implementacja
 
 ```Rust
-fn main(){
-    
+fn main() {
+    let args = Args::parse();
+
+    // Dopasowanie wariantu polecenia przekierowujące wykonanie do odpowiedniego modułu.
+    match args.commands {
+        Commands::Decrypt { algorithm_command } => match algorithm_command {
+            AlgorithmCommand::Substitution { input, output, key } => {
+                substitution::handle_decrypt::handle_decrypt(input, output, key);
+            }
+            AlgorithmCommand::Transposition { input, output, key } => {
+                transposition::handle_decrypt::handle_decrypt(input, output, key);
+            }
+            AlgorithmCommand::Affine {
+                input,
+                output,
+                a,
+                b,
+            } => {
+                affine::handle_decrypt::handle_decrypt(input, output, a, b);
+            }
+        },
+    }
 }
 ```
 
-Kod źródłowy powinien być podzielony na części (definicje i funkcje). Każdy fragment programu powinien być opisany:
+Kod źródłowy funkcji ```affine/handle_encrypt``` odpowiedzialnej za szyfrowanie afiniczne.
 
-- co jest wejściem funkcji
-- co jest wyjściem funkcji
-- co implementuje dana funkcja
+```rust
+pub fn handle_encrypt(input: PathBuf, output: PathBuf, a: u32, b: u32) {
+    let input = open_input(input).expect("Failed to open input file");
+    let output = open_output(output).expect("Failed to open output file");
+
+    let input = input_parser(input);
+    let key = generate_affine_encrypt_key(a, b);
+
+    let buf: String = substitute(&input, &key);
+
+    save_to_file(&buf, output);
+}
+```
+Funkcja w argumencie przyjmuje ścieżkę do pliku wejściowego i wyjściowego oraz wartości a oraz b potrzebne do zaszyfrowania tekstu.
+W pierwszej kolejności funkcja przygotowuje pliki, następnie generuje klucz dla szyfrowania afinicznego, dalej podmienia znaki zgodnie z wygenerowanym kluczem.
+Na końcu funkcja zapisuje wynik do pliku.
+Poniżej przedstawiono działanie funkcji pomocniczej ```generate_affine_encrypt_key```
+```rust
+pub fn generate_affine_encrypt_key(a: u32, b: u32) -> HashMap<char, char> {
+    const M: u32 = 26;
+
+    assert_eq!(
+        euclid_u32(a, M),
+        1,
+        "Parameter `a` must be coprime with 26 (e.g., 1,3,5,7,9,11,15,17,19,21,23,25)."
+    );
+
+    let b = b.rem_euclid(M);
+
+    let mut map = HashMap::with_capacity(26);
+    for x in 0..M {
+        let p = (b'A' + x as u8) as char;
+        let y = (a * x + b).rem_euclid(M);
+        let c = (b'A' + y as u8) as char;
+        map.insert(p, c);
+    }
+    map
+}
+```
+
+Funkcja przyjmuje w argumencie dwie wartości podawane przy włączaniu aplikacji. W pierwszej kolejności deklarowana jest stałą ```M``` o wartości 26, następnie
+ustawiana jest zasada, że wartość a musi być równa liczbie pierwszej. Kolejno obliczana jest wartość b. Dalej tworzona jest mapa 26 wartości oraz w pętli
+nowe wartości klucza są obliczane oraz dodawane do mapy. Na końcu zwracana jest nowo powstała mapa do funkcji.
 
 #### Wyniki
 
-W tej sekcji powinny być przedstawione wyniki pracy programu
 
 ``` sh
-RESULT
+
+./target/debug/Cryptography-and-cryptanalysis e aff -i ./plaintext/alice_wonderland.txt -o ./ciphertext/affineAlice.txt -a 13 -b 5
+
+thread 'main' panicked at src/algorithms/affine/generate_affine_encrypt_key.rs:16:5:
+assertion `left == right` failed: Parameter `a` must be coprime with 26 (e.g., 1,3,5,7,9,11,15,17,19,21,23,25).
+  left: 13
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+./target/debug/Cryptography-and-cryptanalysis e aff -i ./plaintext/alice_wonderland.txt -o ./ciphertext/affineAlice.txt -a 11 -b 5
+
+head -c 100 ./ciphertext/affineAlice.txt 
+GEXOKDAXBGTRGXSQXKTXQDDLDIFWPBXVFMCXSGRKXVPSNDSMXKWFSMGEPVXQDDLPVIDKGEXRVXDIFSJDSXFSJNEXKXPSGEXRSPGX
 ```
 
 ### Zadanie 4
@@ -346,7 +485,22 @@ programem z zadania 2.
 
 ```Rust
 fn main(){
-    
+   let args = Args::parse();
+
+   // Dopasowanie wariantu polecenia przekierowujące wykonanie do odpowiedniego modułu.
+   match args.commands {
+       Commands::Attack { attack_command } => match attack_command {
+           AttackAlgorithmCommand::Affine { args } => {
+               let AttackArgs {
+                   input,
+                   output,
+                   file,
+                   r,
+               } = args;
+               bruteforce::affine::handle_attack(input, output, file, r);
+           }
+       },
+   }
 }
 ```
 
