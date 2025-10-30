@@ -7,7 +7,6 @@
 ### Autorzy: Jakub Babiarski, Jan Chojnacki
 ```mermaid
 flowchart TD
-    flowchart TD
     A[Wejście]
     B(Odczytywanie i walidacja poprawności kombinacji argumentów)
     C(Walidacja ścieżek przekazanych w argumentach)
