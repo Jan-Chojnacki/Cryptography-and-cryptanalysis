@@ -53,6 +53,10 @@ pub enum Commands {
         #[arg(short, long)]
         skip_infrequent: bool,
     },
+    Cryptanalysis {
+        #[command(subcommand)]
+        cryptanalysis_command: CryptanalysisCommand,
+    }
 }
 
 /// Polecenia dotyczące generowania i odczytu n-gramów.
@@ -166,6 +170,32 @@ pub struct AttackArgs {
     #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..=4))]
     pub r: u8,
     /// Ścieżka do pliku z referencyjnymi częstotliwościami n-gramów.
+    #[arg(value_name = "FILE")]
+    pub file: PathBuf,
+}
+
+#[derive(Subcommand, Debug)]
+pub enum CryptanalysisCommand {
+    Heuristic {
+        #[command(subcommand)]
+        algorithm: CryptanalysisAlgorithmCommand,
+    },
+}
+
+#[derive(Subcommand, Debug)]
+pub enum CryptanalysisAlgorithmCommand {
+    Substitution {
+        #[clap(flatten)]
+        args: CryptanalysisArgs,
+    },
+}
+
+#[derive(clap::Args, Debug)]
+pub struct CryptanalysisArgs {
+    #[arg(short, long)]
+    pub input: PathBuf,
+    #[arg(short, long)]
+    pub output: PathBuf,
     #[arg(value_name = "FILE")]
     pub file: PathBuf,
 }

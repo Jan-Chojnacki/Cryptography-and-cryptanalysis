@@ -1,6 +1,7 @@
 //! Główna aplikacja CLI kierująca wywołaniami do poszczególnych modułów kryptograficznych.
 
 mod algorithms;
+mod analysis;
 mod args;
 mod attack;
 mod file_handling;
@@ -10,7 +11,7 @@ mod operations;
 use crate::algorithms::*;
 use crate::args::{
     AlgorithmCommand, Args, AttackAlgorithmCommand, AttackArgs, AttackCommand, Commands,
-    NgramCommand,
+    CryptanalysisAlgorithmCommand, CryptanalysisArgs, CryptanalysisCommand, NgramCommand,
 };
 use crate::attack::*;
 use clap::Parser;
@@ -99,5 +100,18 @@ fn main() {
         } => {
             operations::handle_x2test(input, file, r, skip_infrequent);
         }
+        Commands::Cryptanalysis {
+            cryptanalysis_command,
+        } => match cryptanalysis_command {
+            CryptanalysisCommand::Heuristic { algorithm } => match algorithm {
+                CryptanalysisAlgorithmCommand::Substitution { args } => {
+                    let CryptanalysisArgs {
+                        input,
+                        output,
+                        file,
+                    } = args;
+                }
+            },
+        },
     }
 }

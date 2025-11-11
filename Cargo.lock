@@ -9,6 +9,7 @@ dependencies = [
  "bare_metal_modulo",
  "clap",
  "gcd",
+ "rand",
  "rayon",
  "regex",
  "statrs",
