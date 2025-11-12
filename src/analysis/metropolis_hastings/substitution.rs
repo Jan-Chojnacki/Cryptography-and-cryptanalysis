@@ -21,14 +21,16 @@ pub fn handle_analysis(input: PathBuf, output: PathBuf, ngram_ref: PathBuf, t: u
 }
 
 fn analysis(input: String, ngram_ref: [[f32; 26]; 26], t: usize) -> String {
-    let mut key: [char; 26] = [
-        'A','B','C','D','E','F','G','H','I','J','K','L','M',
-        'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
+    let mut key: [u8; 26] = [
+        b'A',b'B',b'C',b'D',b'E',b'F',b'G',b'H',b'I',b'J',b'K',b'L',b'M',
+        b'N',b'O',b'P',b'Q',b'R',b'S',b'T',b'U',b'V',b'W',b'X',b'Y',b'Z'
     ];
     let mut ngram_k = fast_ngram_generator(&fast_substitute(&input, &key));
 
+    let mut rng = rand::thread_rng();
+
     for _ in 0..t {
-        let rk = roll_key(&key);
+        let rk = roll_key(&key, &mut rng);
         if let Some(new_key) = step(&rk, &input, &ngram_k, &ngram_ref) {
             key = new_key;
             ngram_k = fast_ngram_generator(&fast_substitute(&input, &key));
@@ -39,11 +41,11 @@ fn analysis(input: String, ngram_ref: [[f32; 26]; 26], t: usize) -> String {
 }
 
 fn step(
-    rk: &[char; 26],
+    rk: &[u8; 26],
     input: &str,
     ngram_k: &[[f32; 26]; 26],
     ngram_ref: &[[f32; 26]; 26],
-) -> Option<[char; 26]> {
+) -> Option<[u8; 26]> {
     let pl_k = pl(&ngram_k, &ngram_ref, 0.01);
 
     let ngram_rk = fast_ngram_generator(&fast_substitute(&input, &rk));

@@ -1,15 +1,15 @@
-use rand::seq::SliceRandom;
-use std::collections::HashMap;
+use rand::rngs::ThreadRng;
+use rand::Rng;
 
-pub fn roll_key(key: &[char; 26]) -> [char; 26] {
+pub fn roll_key(key: &[u8; 26], rng: &mut ThreadRng) -> [u8; 26] {
     let mut new_key = key.clone();
 
-    new_key.shuffle(&mut rand::thread_rng());
-    let a = new_key[0];
-    let b = new_key[1];
+    let a = rng.gen_range(0..26);
+    let mut b = rng.gen_range(0..25);
+    if a == b {
+        b += 1
+    }
 
-    new_key[1] = a;
-    new_key[0] = b;
-
+    new_key.swap(a,b);
     new_key
 }
