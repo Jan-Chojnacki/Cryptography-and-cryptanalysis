@@ -20,7 +20,7 @@ pub fn handle_analysis(input: PathBuf, output: PathBuf, ngram_ref: PathBuf, t: u
     save_to_file(&buf, output);
 }
 
-fn analysis(input: String, ngram_ref: [[u64; 26]; 26], t: usize) -> String {
+fn analysis(input: String, ngram_ref: [[f32; 26]; 26], t: usize) -> String {
     let mut key: [char; 26] = [
         'A','B','C','D','E','F','G','H','I','J','K','L','M',
         'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'
@@ -41,8 +41,8 @@ fn analysis(input: String, ngram_ref: [[u64; 26]; 26], t: usize) -> String {
 fn step(
     rk: &[char; 26],
     input: &str,
-    ngram_k: &[[u64; 26]; 26],
-    ngram_ref: &[[u64; 26]; 26],
+    ngram_k: &[[f32; 26]; 26],
+    ngram_ref: &[[f32; 26]; 26],
 ) -> Option<[char; 26]> {
     let pl_k = pl(&ngram_k, &ngram_ref, 0.01);
 
@@ -50,7 +50,7 @@ fn step(
     let pl_rk = pl(&ngram_rk, &ngram_ref, 0.01);
 
     let p = p(pl_k, pl_rk);
-    let u: f64 = rand::random();
+    let u: f32 = rand::random();
 
     match u <= p {
         true => Some(rk.clone()),

@@ -1,4 +1,4 @@
 #[inline]
-pub fn p(pl: f64, pl_new: f64) -> f64 {
-    f64::min(1f64, (pl_new - pl).exp())
+pub fn p(pl: f32, pl_new: f32) -> f32 {
+    f32::min(1.0, (pl_new - pl).exp2())
 }

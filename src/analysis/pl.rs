@@ -1,9 +1,11 @@
-pub fn pl(text: &[[u64; 26]; 26], reference: &[[u64; 26]; 26], a: f64) -> f64 {
-    let mut sum = 0f64;
+use fast_math::log2;
+
+pub fn pl(text: &[[f32; 26]; 26], reference: &[[f32; 26]; 26], a: f32) -> f32 {
+    let mut sum: f32 = 0.0;
 
     for (tt, rr) in text.iter().zip(reference) {
         for (t, r) in tt.iter().zip(rr) {
-            sum += *t as f64 * (*r as f64 + a).ln()
+            sum += *t * log2(*r + a)
         }
     }
 
