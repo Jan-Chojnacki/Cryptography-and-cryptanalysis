@@ -21,7 +21,7 @@ pub fn handle_analysis(input: PathBuf, output: PathBuf, ngram_ref: PathBuf, t: u
     save_to_file(&buf, output);
 }
 
-fn analysis(input: String, ngram_ref: [[f32; 26]; 26], t: usize) -> String {
+fn analysis(input: String, ngram_ref: [f32; 676], t: usize) -> String {
     let log_ngram_ref = precompute_ref_log(&ngram_ref, 0.01);
 
     let mut key: [u8; 26] = [
@@ -52,8 +52,8 @@ fn analysis(input: String, ngram_ref: [[f32; 26]; 26], t: usize) -> String {
 fn step(
     rk: &[u8; 26],
     input: &str,
-    ngram_k: &[[f32; 26]; 26],
-    log_ngram_ref: &[[f32; 26]; 26],
+    ngram_k: &[f32; 676],
+    log_ngram_ref: &[f32; 676],
     buffer: &mut Vec<u8>,
 ) -> Option<[u8; 26]> {
     let pl_k = pl_pre_log(&ngram_k, &log_ngram_ref);

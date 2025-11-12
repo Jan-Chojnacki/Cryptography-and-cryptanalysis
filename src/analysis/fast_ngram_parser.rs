@@ -2,8 +2,8 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 
-pub fn fast_ngram_parser(ngram: File) -> [[f32; 26]; 26] {
-    let mut map: [[f32; 26]; 26] = [[0.0; 26]; 26];
+pub fn fast_ngram_parser(ngram: File) -> [f32; 676] {
+    let mut map: [f32; 676] = [0.0; 676];
     let reader = BufReader::new(ngram);
 
     for line in reader.lines() {
@@ -18,7 +18,7 @@ pub fn fast_ngram_parser(ngram: File) -> [[f32; 26]; 26] {
                 panic!("Invalid ngram format.")
             }
 
-            map[(key[0] - b'A') as usize][(key[1] - b'A') as usize] = value as f32;
+            map[(key[0] - b'A') as usize * 26 + (key[1] - b'A') as usize] = value as f32;
         }
     }
 
