@@ -9,6 +9,7 @@ mod ngram;
 mod operations;
 
 use crate::algorithms::*;
+use crate::analysis::metropolis_hastings;
 use crate::args::{
     AlgorithmCommand, Args, AttackAlgorithmCommand, AttackArgs, AttackCommand, Commands,
     CryptanalysisAlgorithmCommand, CryptanalysisArgs, CryptanalysisCommand, NgramCommand,
@@ -103,13 +104,15 @@ fn main() {
         Commands::Cryptanalysis {
             cryptanalysis_command,
         } => match cryptanalysis_command {
-            CryptanalysisCommand::Heuristic { algorithm } => match algorithm {
+            CryptanalysisCommand::MetropolisHastings { algorithm } => match algorithm {
                 CryptanalysisAlgorithmCommand::Substitution { args } => {
                     let CryptanalysisArgs {
                         input,
                         output,
-                        file,
+                        ngram,
+                        t,
                     } = args;
+                    metropolis_hastings::substitution::handle_analysis(input, output, ngram, t);
                 }
             },
         },

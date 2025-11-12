@@ -176,7 +176,7 @@ pub struct AttackArgs {
 
 #[derive(Subcommand, Debug)]
 pub enum CryptanalysisCommand {
-    Heuristic {
+    MetropolisHastings {
         #[command(subcommand)]
         algorithm: CryptanalysisAlgorithmCommand,
     },
@@ -196,6 +196,8 @@ pub struct CryptanalysisArgs {
     pub input: PathBuf,
     #[arg(short, long)]
     pub output: PathBuf,
-    #[arg(value_name = "FILE")]
-    pub file: PathBuf,
+    #[arg(short, long, value_name = "FILE")]
+    pub ngram: PathBuf,
+    #[arg(short, long)]
+    pub t: usize,
 }
