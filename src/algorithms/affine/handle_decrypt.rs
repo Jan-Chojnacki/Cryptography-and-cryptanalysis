@@ -1,8 +1,8 @@
-use std::path::PathBuf;
 use crate::algorithms::affine::generate_affine_decrypt_key::generate_affine_decrypt_key;
 use crate::algorithms::input_parser::input_parser;
 use crate::algorithms::util::substitute::substitute;
 use crate::file_handling::{open_input, open_output, save_to_file};
+use std::path::PathBuf;
 
 /// Wczytuje dane wejściowe, wyznacza klucz deszyfrujący i zapisuje odszyfrowany tekst.
 ///

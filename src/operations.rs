@@ -70,7 +70,7 @@ pub fn handle_x2test(input: PathBuf, file: PathBuf, r: u8, skip_infrequent: bool
 
     for (k, v) in ngram {
         if skip_infrequent && v < 5 {
-            continue
+            continue;
         }
         if let Some(rv) = ngram_ref.get(&k) {
             let e = rv * n as f64;

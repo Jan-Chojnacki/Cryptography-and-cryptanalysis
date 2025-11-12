@@ -56,7 +56,7 @@ pub enum Commands {
     Cryptanalysis {
         #[command(subcommand)]
         cryptanalysis_command: CryptanalysisCommand,
-    }
+    },
 }
 
 /// Polecenia dotyczące generowania i odczytu n-gramów.

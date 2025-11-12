@@ -34,7 +34,7 @@ fn analysis(input: String, ngram_ref: [f32; 676], t: usize) -> String {
     fast_substitute(&mut buffer, &input, &key);
     let mut ngram_k = fast_ngram_generator(&buffer);
 
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     for _ in 0..t {
         let rk = roll_key(&key, &mut rng);

@@ -1,8 +1,8 @@
-use std::path::PathBuf;
 use crate::algorithms::input_parser::input_parser;
 use crate::algorithms::substitution::key_parser::key_parser;
 use crate::algorithms::util::substitute::substitute;
 use crate::file_handling::{open_input, open_key, open_output, save_to_file};
+use std::path::PathBuf;
 
 /// Wczytuje tekst oraz klucz i zapisuje odszyfrowany tekst jawny.
 ///
