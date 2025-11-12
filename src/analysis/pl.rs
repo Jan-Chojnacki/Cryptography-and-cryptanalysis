@@ -1,15 +1,9 @@
-use std::collections::HashMap;
+pub fn pl(text: &[[u64; 26]; 26], reference: &[[u64; 26]; 26], a: f64) -> f64 {
+    let mut sum = 0f64;
 
-pub fn pl(text: &HashMap<String, u64>, reference: &HashMap<String, u64>, a: f64) -> f64 {
-    let mut sum = 0.0f64;
-    for (k, v) in text {
-        match reference.get(k) {
-            None => {
-                sum += a;
-            }
-            Some(rv) => {
-                sum += *v as f64 * (*rv as f64 + a).log10()
-            }
+    for (tt, rr) in text.iter().zip(reference) {
+        for (t, r) in tt.iter().zip(rr) {
+            sum += *t as f64 * (*r as f64 + a).ln()
         }
     }
 
